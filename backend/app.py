@@ -82,6 +82,98 @@ class BucketOverride(db.Model):
     resume = db.relationship('Resume', backref='bucket_overrides')
     user = db.relationship('User', backref='bucket_overrides')
 
+# --- Interview Management Models ---
+class Interview(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    resume_id = db.Column(db.Integer, db.ForeignKey('resume.id'), nullable=False)
+    job_id = db.Column(db.Integer, db.ForeignKey('job.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # Interview Details
+    title = db.Column(db.String(200), nullable=False)
+    interview_type = db.Column(db.String(50), nullable=False)  # 'phone', 'video', 'onsite', 'technical'
+    duration_minutes = db.Column(db.Integer, default=60)
+    status = db.Column(db.String(20), default='scheduled')  # 'scheduled', 'completed', 'cancelled', 'rescheduled'
+    
+    # Scheduling
+    scheduled_at = db.Column(db.DateTime, nullable=True)
+    timezone = db.Column(db.String(50), default='UTC')
+    location = db.Column(db.String(200), nullable=True)  # For onsite interviews
+    video_link = db.Column(db.String(500), nullable=True)  # For video interviews
+    
+    # Interviewers
+    primary_interviewer = db.Column(db.String(100), nullable=True)
+    additional_interviewers = db.Column(db.Text, nullable=True)  # JSON array of interviewer names
+    
+    # Notes
+    pre_interview_notes = db.Column(db.Text, nullable=True)
+    post_interview_notes = db.Column(db.Text, nullable=True)
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    resume = db.relationship('Resume', backref='interviews')
+    job = db.relationship('Job', backref='interviews')
+    user = db.relationship('User', backref='interviews')
+    feedback = db.relationship('InterviewFeedback', backref='interview', uselist=False)
+
+class InterviewFeedback(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    interview_id = db.Column(db.Integer, db.ForeignKey('interview.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # Overall Assessment
+    overall_rating = db.Column(db.Integer, nullable=False)  # 1-5 scale
+    hire_recommendation = db.Column(db.String(20), nullable=False)  # 'strong_hire', 'hire', 'weak_hire', 'no_hire', 'strong_no_hire'
+    
+    # Detailed Ratings (JSON)
+    technical_skills = db.Column(db.Integer, nullable=True)  # 1-5
+    communication_skills = db.Column(db.Integer, nullable=True)  # 1-5
+    problem_solving = db.Column(db.Integer, nullable=True)  # 1-5
+    cultural_fit = db.Column(db.Integer, nullable=True)  # 1-5
+    experience_relevance = db.Column(db.Integer, nullable=True)  # 1-5
+    
+    # Written Feedback
+    strengths = db.Column(db.Text, nullable=True)
+    areas_of_concern = db.Column(db.Text, nullable=True)
+    additional_notes = db.Column(db.Text, nullable=True)
+    
+    # Interview Questions & Responses
+    questions_asked = db.Column(db.Text, nullable=True)  # JSON array of questions
+    candidate_responses = db.Column(db.Text, nullable=True)  # JSON array of responses
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    user = db.relationship('User', backref='interview_feedbacks')
+
+class InterviewQuestion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    job_id = db.Column(db.Integer, db.ForeignKey('job.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # Question Details
+    question_text = db.Column(db.Text, nullable=False)
+    question_type = db.Column(db.String(50), nullable=False)  # 'technical', 'behavioral', 'situational', 'culture_fit'
+    difficulty = db.Column(db.String(20), default='medium')  # 'easy', 'medium', 'hard'
+    category = db.Column(db.String(100), nullable=True)  # e.g., 'algorithms', 'system_design', 'leadership'
+    
+    # Usage Tracking
+    times_used = db.Column(db.Integer, default=0)
+    avg_rating = db.Column(db.Float, default=0.0)  # Average rating from interviewers
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    job = db.relationship('Job', backref='interview_questions')
+    user = db.relationship('User', backref='interview_questions')
+
 # --- WebSocket Events ---
 @socketio.on('connect')
 def handle_connect():
@@ -538,4 +630,469 @@ def get_feedback_stats():
 
 @app.route('/')
 def home():
-    return "Hello from the Backend!" 
+    return "Hello from the Backend!"
+
+# --- Interview Management API Endpoints ---
+
+@app.route('/api/interviews', methods=['GET'])
+def get_interviews():
+    """Get all interviews for the current user"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    try:
+        interviews = Interview.query.filter_by(user_id=default_user.id).order_by(Interview.created_at.desc()).all()
+        
+        return jsonify([{
+            'id': i.id,
+            'resume_id': i.resume_id,
+            'job_id': i.job_id,
+            'title': i.title,
+            'interview_type': i.interview_type,
+            'duration_minutes': i.duration_minutes,
+            'status': i.status,
+            'scheduled_at': i.scheduled_at.isoformat() if i.scheduled_at else None,
+            'timezone': i.timezone,
+            'location': i.location,
+            'video_link': i.video_link,
+            'primary_interviewer': i.primary_interviewer,
+            'additional_interviewers': json.loads(i.additional_interviewers) if i.additional_interviewers else [],
+            'candidate_name': i.resume.candidate_name,
+            'job_title': i.job.description[:100] + '...' if len(i.job.description) > 100 else i.job.description,
+            'created_at': i.created_at.isoformat(),
+            'updated_at': i.updated_at.isoformat()
+        } for i in interviews])
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to get interviews: {str(e)}'}), 500
+
+@app.route('/api/interviews/<int:resume_id>', methods=['GET'])
+def get_resume_interviews(resume_id):
+    """Get all interviews for a specific resume"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    # Verify resume exists and belongs to user
+    resume = Resume.query.filter_by(id=resume_id).first()
+    if not resume:
+        return jsonify({'error': 'Resume not found'}), 404
+    
+    if resume.job.user_id != default_user.id:
+        return jsonify({'error': 'Unauthorized access to resume'}), 403
+    
+    try:
+        interviews = Interview.query.filter_by(resume_id=resume_id).order_by(Interview.created_at.desc()).all()
+        
+        return jsonify([{
+            'id': i.id,
+            'title': i.title,
+            'interview_type': i.interview_type,
+            'duration_minutes': i.duration_minutes,
+            'status': i.status,
+            'scheduled_at': i.scheduled_at.isoformat() if i.scheduled_at else None,
+            'timezone': i.timezone,
+            'location': i.location,
+            'video_link': i.video_link,
+            'primary_interviewer': i.primary_interviewer,
+            'additional_interviewers': json.loads(i.additional_interviewers) if i.additional_interviewers else [],
+            'pre_interview_notes': i.pre_interview_notes,
+            'post_interview_notes': i.post_interview_notes,
+            'created_at': i.created_at.isoformat(),
+            'updated_at': i.updated_at.isoformat(),
+            'has_feedback': i.feedback is not None
+        } for i in interviews])
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to get interviews: {str(e)}'}), 500
+
+@app.route('/api/interviews', methods=['POST'])
+def create_interview():
+    """Create a new interview"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    data = request.get_json()
+    
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+    
+    required_fields = ['resume_id', 'title', 'interview_type']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'error': f'Missing required field: {field}'}), 400
+    
+    # Verify resume exists and belongs to user
+    resume = Resume.query.filter_by(id=data['resume_id']).first()
+    if not resume:
+        return jsonify({'error': 'Resume not found'}), 404
+    
+    if resume.job.user_id != default_user.id:
+        return jsonify({'error': 'Unauthorized access to resume'}), 403
+    
+    try:
+        # Parse scheduled_at if provided
+        scheduled_at = None
+        if data.get('scheduled_at'):
+            scheduled_at = datetime.fromisoformat(data['scheduled_at'].replace('Z', '+00:00'))
+        
+        interview = Interview(
+            resume_id=data['resume_id'],
+            job_id=resume.job_id,
+            user_id=default_user.id,
+            title=data['title'],
+            interview_type=data['interview_type'],
+            duration_minutes=data.get('duration_minutes', 60),
+            status=data.get('status', 'scheduled'),
+            scheduled_at=scheduled_at,
+            timezone=data.get('timezone', 'UTC'),
+            location=data.get('location'),
+            video_link=data.get('video_link'),
+            primary_interviewer=data.get('primary_interviewer'),
+            additional_interviewers=json.dumps(data.get('additional_interviewers', [])),
+            pre_interview_notes=data.get('pre_interview_notes')
+        )
+        
+        db.session.add(interview)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Interview created successfully',
+            'interview_id': interview.id
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to create interview: {str(e)}'}), 500
+
+@app.route('/api/interviews/<int:interview_id>', methods=['PUT'])
+def update_interview(interview_id):
+    """Update an existing interview"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    interview = Interview.query.filter_by(id=interview_id, user_id=default_user.id).first()
+    if not interview:
+        return jsonify({'error': 'Interview not found'}), 404
+    
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+    
+    try:
+        # Update fields if provided
+        if 'title' in data:
+            interview.title = data['title']
+        if 'interview_type' in data:
+            interview.interview_type = data['interview_type']
+        if 'duration_minutes' in data:
+            interview.duration_minutes = data['duration_minutes']
+        if 'status' in data:
+            interview.status = data['status']
+        if 'scheduled_at' in data:
+            interview.scheduled_at = datetime.fromisoformat(data['scheduled_at'].replace('Z', '+00:00')) if data['scheduled_at'] else None
+        if 'timezone' in data:
+            interview.timezone = data['timezone']
+        if 'location' in data:
+            interview.location = data['location']
+        if 'video_link' in data:
+            interview.video_link = data['video_link']
+        if 'primary_interviewer' in data:
+            interview.primary_interviewer = data['primary_interviewer']
+        if 'additional_interviewers' in data:
+            interview.additional_interviewers = json.dumps(data['additional_interviewers'])
+        if 'pre_interview_notes' in data:
+            interview.pre_interview_notes = data['pre_interview_notes']
+        if 'post_interview_notes' in data:
+            interview.post_interview_notes = data['post_interview_notes']
+        
+        interview.updated_at = datetime.utcnow()
+        db.session.commit()
+        
+        return jsonify({'message': 'Interview updated successfully'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to update interview: {str(e)}'}), 500
+
+@app.route('/api/interviews/<int:interview_id>', methods=['DELETE'])
+def delete_interview(interview_id):
+    """Delete an interview"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    interview = Interview.query.filter_by(id=interview_id, user_id=default_user.id).first()
+    if not interview:
+        return jsonify({'error': 'Interview not found'}), 404
+    
+    try:
+        db.session.delete(interview)
+        db.session.commit()
+        
+        return jsonify({'message': 'Interview deleted successfully'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to delete interview: {str(e)}'}), 500
+
+@app.route('/api/interviews/<int:interview_id>/feedback', methods=['POST'])
+def submit_interview_feedback(interview_id):
+    """Submit feedback for an interview"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    interview = Interview.query.filter_by(id=interview_id, user_id=default_user.id).first()
+    if not interview:
+        return jsonify({'error': 'Interview not found'}), 404
+    
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+    
+    required_fields = ['overall_rating', 'hire_recommendation']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'error': f'Missing required field: {field}'}), 400
+    
+    try:
+        # Check if feedback already exists
+        existing_feedback = InterviewFeedback.query.filter_by(interview_id=interview_id).first()
+        if existing_feedback:
+            return jsonify({'error': 'Feedback already exists for this interview'}), 400
+        
+        feedback = InterviewFeedback(
+            interview_id=interview_id,
+            user_id=default_user.id,
+            overall_rating=data['overall_rating'],
+            hire_recommendation=data['hire_recommendation'],
+            technical_skills=data.get('technical_skills'),
+            communication_skills=data.get('communication_skills'),
+            problem_solving=data.get('problem_solving'),
+            cultural_fit=data.get('cultural_fit'),
+            experience_relevance=data.get('experience_relevance'),
+            strengths=data.get('strengths'),
+            areas_of_concern=data.get('areas_of_concern'),
+            additional_notes=data.get('additional_notes'),
+            questions_asked=json.dumps(data.get('questions_asked', [])),
+            candidate_responses=json.dumps(data.get('candidate_responses', []))
+        )
+        
+        db.session.add(feedback)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Interview feedback submitted successfully',
+            'feedback_id': feedback.id
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to submit feedback: {str(e)}'}), 500
+
+@app.route('/api/interviews/<int:interview_id>/feedback', methods=['GET'])
+def get_interview_feedback(interview_id):
+    """Get feedback for an interview"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    interview = Interview.query.filter_by(id=interview_id, user_id=default_user.id).first()
+    if not interview:
+        return jsonify({'error': 'Interview not found'}), 404
+    
+    feedback = InterviewFeedback.query.filter_by(interview_id=interview_id).first()
+    if not feedback:
+        return jsonify({'error': 'No feedback found for this interview'}), 404
+    
+    return jsonify({
+        'id': feedback.id,
+        'overall_rating': feedback.overall_rating,
+        'hire_recommendation': feedback.hire_recommendation,
+        'technical_skills': feedback.technical_skills,
+        'communication_skills': feedback.communication_skills,
+        'problem_solving': feedback.problem_solving,
+        'cultural_fit': feedback.cultural_fit,
+        'experience_relevance': feedback.experience_relevance,
+        'strengths': feedback.strengths,
+        'areas_of_concern': feedback.areas_of_concern,
+        'additional_notes': feedback.additional_notes,
+        'questions_asked': json.loads(feedback.questions_asked) if feedback.questions_asked else [],
+        'candidate_responses': json.loads(feedback.candidate_responses) if feedback.candidate_responses else [],
+        'created_at': feedback.created_at.isoformat(),
+        'updated_at': feedback.updated_at.isoformat()
+    })
+
+@app.route('/api/interviews/<int:interview_id>/feedback', methods=['PUT'])
+def update_interview_feedback(interview_id):
+    """Update feedback for an interview"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    interview = Interview.query.filter_by(id=interview_id, user_id=default_user.id).first()
+    if not interview:
+        return jsonify({'error': 'Interview not found'}), 404
+    
+    feedback = InterviewFeedback.query.filter_by(interview_id=interview_id).first()
+    if not feedback:
+        return jsonify({'error': 'No feedback found for this interview'}), 404
+    
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+    
+    try:
+        # Update fields if provided
+        if 'overall_rating' in data:
+            feedback.overall_rating = data['overall_rating']
+        if 'hire_recommendation' in data:
+            feedback.hire_recommendation = data['hire_recommendation']
+        if 'technical_skills' in data:
+            feedback.technical_skills = data['technical_skills']
+        if 'communication_skills' in data:
+            feedback.communication_skills = data['communication_skills']
+        if 'problem_solving' in data:
+            feedback.problem_solving = data['problem_solving']
+        if 'cultural_fit' in data:
+            feedback.cultural_fit = data['cultural_fit']
+        if 'experience_relevance' in data:
+            feedback.experience_relevance = data['experience_relevance']
+        if 'strengths' in data:
+            feedback.strengths = data['strengths']
+        if 'areas_of_concern' in data:
+            feedback.areas_of_concern = data['areas_of_concern']
+        if 'additional_notes' in data:
+            feedback.additional_notes = data['additional_notes']
+        if 'questions_asked' in data:
+            feedback.questions_asked = json.dumps(data['questions_asked'])
+        if 'candidate_responses' in data:
+            feedback.candidate_responses = json.dumps(data['candidate_responses'])
+        
+        feedback.updated_at = datetime.utcnow()
+        db.session.commit()
+        
+        return jsonify({'message': 'Interview feedback updated successfully'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to update feedback: {str(e)}'}), 500
+
+@app.route('/api/interviews/questions/<int:job_id>', methods=['GET'])
+def get_interview_questions(job_id):
+    """Get interview questions for a job"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    # Verify job exists and belongs to user
+    job = Job.query.filter_by(id=job_id, user_id=default_user.id).first()
+    if not job:
+        return jsonify({'error': 'Job not found'}), 404
+    
+    try:
+        questions = InterviewQuestion.query.filter_by(job_id=job_id).order_by(InterviewQuestion.created_at.desc()).all()
+        
+        return jsonify([{
+            'id': q.id,
+            'question_text': q.question_text,
+            'question_type': q.question_type,
+            'difficulty': q.difficulty,
+            'category': q.category,
+            'times_used': q.times_used,
+            'avg_rating': q.avg_rating,
+            'created_at': q.created_at.isoformat()
+        } for q in questions])
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to get questions: {str(e)}'}), 500
+
+@app.route('/api/interviews/questions', methods=['POST'])
+def create_interview_question():
+    """Create a new interview question"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+    
+    required_fields = ['job_id', 'question_text', 'question_type']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'error': f'Missing required field: {field}'}), 400
+    
+    # Verify job exists and belongs to user
+    job = Job.query.filter_by(id=data['job_id'], user_id=default_user.id).first()
+    if not job:
+        return jsonify({'error': 'Job not found'}), 404
+    
+    try:
+        question = InterviewQuestion(
+            job_id=data['job_id'],
+            user_id=default_user.id,
+            question_text=data['question_text'],
+            question_type=data['question_type'],
+            difficulty=data.get('difficulty', 'medium'),
+            category=data.get('category')
+        )
+        
+        db.session.add(question)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Interview question created successfully',
+            'question_id': question.id
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to create question: {str(e)}'}), 500
+
+@app.route('/api/interviews/questions/<int:question_id>', methods=['DELETE'])
+def delete_interview_question(question_id):
+    """Delete an interview question"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    question = InterviewQuestion.query.filter_by(id=question_id, user_id=default_user.id).first()
+    if not question:
+        return jsonify({'error': 'Question not found'}), 404
+    
+    try:
+        db.session.delete(question)
+        db.session.commit()
+        
+        return jsonify({'message': 'Interview question deleted successfully'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to delete question: {str(e)}'}), 500 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import FeedbackModal from './components/FeedbackModal';
+import InterviewModal from './components/InterviewModal';
 import './JobsPage.css';
 
 const SkillMatrix = ({ skills }) => (
@@ -53,6 +54,8 @@ const JobDetailsPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
     const [selectedResumeForFeedback, setSelectedResumeForFeedback] = useState(null);
+    const [isInterviewModalOpen, setIsInterviewModalOpen] = useState(false);
+    const [selectedResumeForInterview, setSelectedResumeForInterview] = useState(null);
     const detailsRef = useRef(null);
 
     useEffect(() => {
@@ -136,6 +139,17 @@ const JobDetailsPage = () => {
         }
     };
 
+    const handleInterviewClick = (resume) => {
+        setSelectedResumeForInterview(resume);
+        setIsInterviewModalOpen(true);
+    };
+
+    const handleInterviewCreated = (interviewId) => {
+        // Optionally refresh the page or show a success message
+        console.log('Interview created with ID:', interviewId);
+        // You could also update the UI to show that an interview was scheduled
+    };
+
     const getScoreClass = (score) => {
         if (score >= 90) return 'high';
         if (score >= 80) return 'medium-high';
@@ -207,6 +221,12 @@ const JobDetailsPage = () => {
                             </div>
                             <div className="header-actions">
                                 <button 
+                                    className="interview-button"
+                                    onClick={() => handleInterviewClick(selectedResume)}
+                                >
+                                    📅 Schedule Interview
+                                </button>
+                                <button 
                                     className="feedback-button"
                                     onClick={() => handleFeedbackClick(selectedResume)}
                                 >
@@ -237,6 +257,14 @@ const JobDetailsPage = () => {
                 resume={selectedResumeForFeedback}
                 onSubmitFeedback={handleFeedbackSubmit}
                 onSubmitOverride={handleOverrideSubmit}
+            />
+
+            <InterviewModal
+                isOpen={isInterviewModalOpen}
+                onClose={() => setIsInterviewModalOpen(false)}
+                resume={selectedResumeForInterview}
+                jobId={jobId}
+                onInterviewCreated={handleInterviewCreated}
             />
         </div>
     );

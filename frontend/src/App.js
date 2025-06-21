@@ -6,6 +6,7 @@ import HomePage from './HomePage';
 import UploadPage from './UploadPage';
 import JobsListPage from './JobsListPage';
 import JobDetailsPage from './JobDetailsPage';
+import InterviewsPage from './InterviewsPage';
 import './App.css';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
             <Route path="/upload" element={<UploadPage />} />
             <Route path="/jobs" element={<JobsListPage />} />
             <Route path="/jobs/:jobId" element={<JobDetailsPage />} />
+            <Route path="/interviews" element={<InterviewsPage />} />
             <Route path="/" element={<HomePage />} />
           </Routes>
         </main>
