@@ -13,14 +13,19 @@
 **Solution Applied**:
 1. **Improved AI Prompt**: Modified the prompt in `ai_service.py` to be more flexible:
    - Changed from strict "MUST return 'Name Not Found'" to "Make a best effort to find the name"
-   - Added guidance for when to use "Name Not Found"
+   - Encouraged the AI to try harder before giving up
+2. **Enhanced Backend Logic**: Added explicit handling for "Name Not Found" responses:
+   - Check if AI returns "Name Not Found" and replace with "Not Provided"
+   - Use user-friendly fallback values in the database
+3. **Better Error Handling**: Implemented proper fallback chain
 
-2. **Enhanced Backend Logic**: Updated `app.py` to handle edge cases:
-   - Added explicit check for "Name Not Found" string from AI
-   - Replace with user-friendly "Not Provided" before database storage
-   - Improved fallback logic
+**Lessons for Future AI Integration**:
+- **Don't make AI prompts too strict** - encourage best effort over rigid failure
+- **Always validate AI responses** before storing in database
+- **Use user-friendly fallback values** instead of technical error messages
+- **Test with real data** to ensure AI behavior is as expected
 
-3. **Database Consistency**: Ensured consistent naming across the application
+**Pattern Recognition**: This issue occurred twice during development, indicating a tendency to make AI prompts too rigid. Future AI integrations should start with flexible prompts and add constraints only when necessary.
 
 ### Key Lessons:
 
@@ -67,4 +72,89 @@
 
 ---
 *Last Updated: 2025-06-21*
-*Documented by: Development Team* 
+*Documented by: Development Team*
+
+## General Development Challenges & Resolutions
+
+### Challenge 1: Chronic Backend Server Startup Failures
+
+**Symptoms:**
+- The application was unresponsive after being started.
+- Multiple `curl` validation checks failed with "Could not connect to server."
+- The backend process appeared to crash silently when run in the background.
+
+**Root Cause Analysis:**
+The core issue was an `ImportError: attempted relative import with no known parent package`. This happened because I was trying to run the backend application by executing the script directly (`python backend/__main__.py`). In this mode, Python does not recognize the `backend` directory as a "package," so relative imports like `from .app import ...` fail.
+
+**Resolution:**
+The definitive fix was to execute the backend as a **Python module** from the **project's root directory**.
+1. **Correct Command:** `python -m backend`
+2. **Execution Location:** This command must be run from the `OrganizeFiles/` directory, which is the parent of the `backend/` package.
+3. This approach allows Python to correctly recognize the `backend` directory as a package, resolving all relative and absolute import issues within it.
+
+**Future Action Plan:**
+1. **Prioritize Module Execution:** For any Python project with a package structure, **always** default to using `python -m <package_name>` from the project root.
+2. **Immediate Foreground Debugging:** If a background server process fails to respond to the *first* `curl` check, I will immediately stop it and re-run it in the **foreground**.
+
+### Challenge 2: Database Schema Initialization Errors
+
+**Symptom:**
+- The application crashed with `sqlalchemy.exc.OperationalError: no such table: job` after the database schema was modified.
+
+**Root Cause Analysis:**
+When the `Resume` and `Job` models in `app.py` were updated, the existing `resumes.db` file became obsolete. The application logic to create the new tables (`db.create_all()`) was either in the wrong place or not being executed due to the server failing to start properly.
+
+**Resolution:**
+A two-step process was required:
+1. **Code:** Ensure `db.create_all()` is called within the application context in the main startup script (`backend/__main__.py`).
+2. **Process:** For this SQLite setup, the migration process is to forcefully stop the server, delete the stale `resumes.db` file, and restart the server, allowing the `db.create_all()` logic to generate a fresh database with the correct schema.
+
+**Future Action Plan:**
+1. **Schema Change Checklist:** When a database model is modified, I will follow this explicit checklist:
+   - a. Announce that a database migration is necessary.
+   - b. Stop the running backend server.
+   - c. Delete the `.db` file.
+   - d. Restart the server using the correct module execution method.
+   - e. Validate the server is running before proceeding.
+
+### Challenge 3: Cross-Platform Pathing Errors in Terminal
+
+**Symptom:**
+- PowerShell errors occurred, such as `Set-Location: Cannot find drive. A drive with the name '/b' does not exist.`
+
+**Root Cause Analysis:**
+I was using Linux-style absolute paths (e.g., `/b/Coding/...`) in a Windows PowerShell terminal, which does not recognize this format.
+
+**Resolution:**
+The fix was to switch to relative paths (e.g., `cd ..`) which are platform-agnostic and work correctly from a known working directory.
+
+**Future Action Plan:**
+1. **Verify User OS:** I will always check the user's reported OS at the start of a session.
+2. **Default to Relative Paths:** I will prioritize using relative navigation (`cd ..`, `cd frontend`) over absolute paths for terminal commands to ensure cross-platform compatibility.
+
+---
+
+## Technical Insights & Best Practices
+
+### AI Integration Patterns
+- **Prompt Engineering**: Start flexible, add constraints only when necessary
+- **Response Validation**: Always validate AI responses before storing
+- **Error Handling**: Use user-friendly fallback values
+- **Testing**: Test with real data to ensure expected behavior
+
+### Frontend-Backend Communication
+- **WebSocket Integration**: Successfully implemented real-time updates
+- **Progress Tracking**: Added completion tracking for background processing
+- **Error Handling**: Proper error propagation from backend to frontend
+
+### Database Management
+- **Schema Changes**: Always follow migration checklist
+- **Data Validation**: Validate data before storing
+- **Fallback Values**: Use user-friendly defaults
+
+### Future Recommendations
+1. **Add comprehensive logging** for AI interactions
+2. **Implement retry logic** for failed AI calls
+3. **Add data validation** at API endpoints
+4. **Consider caching** for repeated AI analyses
+5. **Monitor AI response patterns** to improve prompts 
