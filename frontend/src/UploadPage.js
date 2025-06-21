@@ -6,8 +6,9 @@ const UploadPage = () => {
     const [jobDescription, setJobDescription] = useState('');
     const [resumes, setResumes] = useState([]);
     const [message, setMessage] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
+    const [analysisResult, setAnalysisResult] = useState(null);
     const navigate = useNavigate();
 
     const handleFileChange = (e) => {
@@ -37,40 +38,46 @@ const UploadPage = () => {
         }
     }, []);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         if (resumes.length === 0) {
             setMessage('Error: Please upload at least one résumé.');
             return;
         }
-        setIsLoading(true);
+
+        setIsAnalyzing(true);
+        setAnalysisResult(null);
         setMessage('');
 
-        const formData = new FormData();
-        formData.append('jobDescription', jobDescription);
-        for (let i = 0; i < resumes.length; i++) {
-            formData.append('resumes', resumes[i]);
-        }
-
-        try {
-            const response = await fetch('http://127.0.0.1:5000/api/analyze', {
-                method: 'POST',
-                body: formData,
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                setMessage(`Success: ${data.message}`);
-                navigate(`/jobs/${data.job_id}`);
-            } else {
-                throw new Error(data.error || 'An error occurred during analysis.');
+        setTimeout(async () => {
+            const formData = new FormData();
+            formData.append('jobDescription', jobDescription);
+            for (let i = 0; i < resumes.length; i++) {
+                formData.append('resumes', resumes[i]);
             }
-        } catch (error) {
-            setMessage(`Error: ${error.message}`);
-        } finally {
-            setIsLoading(false);
-        }
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/analyze', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const data = await response.json();
+                setAnalysisResult(data);
+
+                if (response.ok) {
+                    setMessage(`Analysis Complete: ${data.processed_files?.length || 0} processed, ${data.skipped_files?.length || 0} skipped.`);
+                    setTimeout(() => {
+                        navigate(`/jobs/${data.job_id}`);
+                    }, 2000);
+                } else {
+                    throw new Error(data.error || 'An error occurred during analysis.');
+                }
+            } catch (error) {
+                setMessage(`Error: ${error.message}`);
+                setIsAnalyzing(false);
+            }
+        }, 100);
     };
 
     return (
@@ -121,11 +128,24 @@ const UploadPage = () => {
                             </div>
                         )}
                     </div>
-                    <button type="submit" className="cta-button" disabled={isLoading}>
-                        {isLoading ? 'Analyzing...' : 'Start Analysis'}
+                    <button type="submit" className={`cta-button ${isAnalyzing ? 'analyzing' : ''}`} disabled={isAnalyzing}>
+                        <span className="button-text">
+                            {isAnalyzing ? 'Analyzing...' : 'Start Analysis'}
+                        </span>
                     </button>
                 </form>
                 {message && <p className={`message ${message.startsWith('Error') ? 'error' : 'success'}`}>{message}</p>}
+                
+                {analysisResult && analysisResult.skipped_files && analysisResult.skipped_files.length > 0 && (
+                    <div className="skipped-files-report">
+                        <h4>Skipped Files Report</h4>
+                        <ul>
+                            {analysisResult.skipped_files.map((file, index) => (
+                                <li key={index}><strong>{file.filename}</strong> - {file.reason}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
             </div>
         </div>
     );

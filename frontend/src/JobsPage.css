@@ -101,6 +101,20 @@
     font-size: 0.95rem;
 }
 
+.candidate-summary-table tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.candidate-summary-table tbody tr:hover {
+    background-color: var(--glass-bg);
+}
+
+.candidate-summary-table tbody tr.selected {
+    background-color: rgba(0, 170, 255, 0.15);
+    border-left: 3px solid var(--primary-color);
+}
+
 .score-badge {
     display: inline-block;
     padding: 0.3rem 0.8rem;
@@ -140,17 +154,38 @@
     border-bottom: 1px solid var(--glass-border-color);
     padding-bottom: 1rem;
     margin-bottom: 1rem;
+    gap: 1rem;
 }
 
-.detailed-resume-header h3 {
-    margin: 0;
+.detailed-resume-header h3.candidate-name {
+    margin: 0.5rem 0 0 0;
     font-size: 2rem;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #fff;
+    line-height: 1.1;
 }
+
+.candidate-bucket-tag {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+    color: #fff;
+    background-color: #888; /* Default color */
+}
+
+/* Bucket-specific colors */
+.candidate-bucket-tag.bucket-top-tier { background-color: #23d5ab; }
+.candidate-bucket-tag.bucket-strong-fit { background-color: #23a6d5; }
+.candidate-bucket-tag.bucket-good-fit { background-color: #23a6d5; }
+.candidate-bucket-tag.bucket-potential-fit { background-color: #ee7752; }
+.candidate-bucket-tag.bucket-lacks-experience { background-color: #e73c7e; }
+.candidate-bucket-tag.bucket-not-a-fit { background-color: #898989; }
+.candidate-bucket-tag.bucket-default { background-color: #5c5c5c; }
 
 .reasoning {
     font-style: italic;

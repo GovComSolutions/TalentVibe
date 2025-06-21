@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import './JobsPage.css';
 
@@ -47,8 +47,10 @@ const Logistics = ({ logistics }) => (
 const JobDetailsPage = () => {
     const { jobId } = useParams();
     const [jobDetails, setJobDetails] = useState(null);
+    const [selectedResumeId, setSelectedResumeId] = useState(null);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const detailsRef = useRef(null);
 
     useEffect(() => {
         const fetchJobDetails = async () => {
@@ -72,11 +74,44 @@ const JobDetailsPage = () => {
         return [...jobDetails.resumes].sort((a, b) => (b.analysis?.fit_score || 0) - (a.analysis?.fit_score || 0));
     }, [jobDetails]);
 
+    // Automatically select the top-ranked resume on initial load
+    useEffect(() => {
+        if (sortedResumes && sortedResumes.length > 0 && !selectedResumeId) {
+            setSelectedResumeId(sortedResumes[0].id);
+        }
+    }, [sortedResumes, selectedResumeId]);
+
+    const selectedResume = useMemo(() => {
+        if (!selectedResumeId) return null;
+        return sortedResumes.find(r => r.id === selectedResumeId);
+    }, [selectedResumeId, sortedResumes]);
+
+    // Scroll to details when a resume is selected
+    useEffect(() => {
+        if (selectedResumeId && detailsRef.current) {
+            detailsRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+            });
+        }
+    }, [selectedResumeId]);
+
+    const handleRowClick = (resumeId) => {
+        const newId = selectedResumeId === resumeId ? null : resumeId;
+        setSelectedResumeId(newId);
+    };
+
     const getScoreClass = (score) => {
         if (score >= 90) return 'high';
         if (score >= 80) return 'medium-high';
         if (score >= 65) return 'medium';
         return 'low';
+    };
+
+    const getBucketClass = (bucket) => {
+        if (!bucket) return 'default';
+        const bucketName = bucket.toLowerCase().replace(/\s+/g, '-');
+        return `bucket-${bucketName}`;
     };
 
     if (isLoading) return <div className="job-details-container"><p>Loading job details...</p></div>;
@@ -88,7 +123,7 @@ const JobDetailsPage = () => {
             <Link to="/jobs" className="back-link">← Back to All Jobs</Link>
             
             <div className="glass-container job-summary-card">
-                <h2>{jobDetails.description.split('\\n')[0]} - Candidate Overview</h2>
+                <h2>Candidate Overview</h2>
                 <div className="candidate-summary-table">
                     <table>
                         <thead>
@@ -103,9 +138,13 @@ const JobDetailsPage = () => {
                         </thead>
                         <tbody>
                             {sortedResumes.map((resume, index) => (
-                                <tr key={resume.id}>
+                                <tr 
+                                    key={resume.id} 
+                                    onClick={() => handleRowClick(resume.id)}
+                                    className={selectedResumeId === resume.id ? 'selected' : ''}
+                                >
                                     <td><strong>{index + 1}</strong></td>
-                                    <td>{resume.filename}</td>
+                                    <td>{resume.candidate_name || resume.filename}</td>
                                     <td>
                                         <span className={`score-badge ${getScoreClass(resume.analysis?.fit_score)}`}>
                                             {resume.analysis?.fit_score || 'N/A'}
@@ -121,35 +160,33 @@ const JobDetailsPage = () => {
                 </div>
             </div>
 
-            <div className="detailed-resumes-list">
-                <h3>Detailed Analysis</h3>
-                {sortedResumes.map(resume => {
-                    const analysis = resume.analysis || {};
-                    return (
-                        <div key={resume.id} className="glass-container detailed-resume-card">
-                             <div className="detailed-resume-header">
-                                <h3>{analysis.bucket || 'Analysis Pending'}</h3>
-                                <span className={`score-badge large ${getScoreClass(analysis.fit_score)}`}>
-                                    FIT SCORE: {analysis.fit_score || 'N/A'} / 100
-                                </span>
+            {selectedResume && (
+                <div className="detailed-analysis-section" ref={detailsRef}>
+                    <div key={selectedResume.id} className="glass-container detailed-resume-card">
+                        <div className="detailed-resume-header">
+                            <div>
+                                <div className={`candidate-bucket-tag ${getBucketClass(selectedResume.analysis?.bucket)}`}>
+                                    {selectedResume.analysis?.bucket || 'Pending'}
+                                </div>
+                                <h3 className="candidate-name">{selectedResume.candidate_name || selectedResume.filename}</h3>
                             </div>
-
-                            <p className="reasoning">{analysis.reasoning}</p>
-
-                            <div className="summary-points">
-                                <h4>Summary</h4>
-                                <ul>
-                                    {analysis.summary_points?.map((point, i) => <li key={`sum-${i}`}>{point}</li>)}
-                                </ul>
-                            </div>
-                            
-                            {analysis.skill_matrix && <SkillMatrix skills={analysis.skill_matrix} />}
-                            {analysis.timeline && <Timeline timeline={analysis.timeline} />}
-                            {analysis.logistics && <Logistics logistics={analysis.logistics} />}
+                            <span className={`score-badge large ${getScoreClass(selectedResume.analysis?.fit_score)}`}>
+                                FIT SCORE: {selectedResume.analysis?.fit_score || 'N/A'} / 100
+                            </span>
                         </div>
-                    );
-                })}
-            </div>
+                        <p className="reasoning">{selectedResume.analysis?.reasoning}</p>
+                        <div className="summary-points">
+                            <h4>Summary</h4>
+                            <ul>
+                                {selectedResume.analysis?.summary_points?.map((point, i) => <li key={`sum-${i}`}>{point}</li>)}
+                            </ul>
+                        </div>
+                        {selectedResume.analysis?.skill_matrix && <SkillMatrix skills={selectedResume.analysis.skill_matrix} />}
+                        {selectedResume.analysis?.timeline && <Timeline timeline={selectedResume.analysis.timeline} />}
+                        {selectedResume.analysis?.logistics && <Logistics logistics={selectedResume.analysis.logistics} />}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

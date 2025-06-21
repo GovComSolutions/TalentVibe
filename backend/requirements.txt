@@ -4,4 +4,7 @@ pytest
 Flask-SQLAlchemy
 SQLAlchemy
 openai
-python-dotenv 
+python-dotenv
+PyMuPDF
+python-docx
+waitress 
