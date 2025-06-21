@@ -367,13 +367,13 @@
         "id": 12,
         "title": "Develop Feedback Loop for Model Fine-Tuning",
         "description": "Allow users to override candidate buckets and provide feedback for model improvement.",
-        "details": "Implement UI and backend logic for bucket overrides and feedback submission. Store feedback for future model updates.",
-        "testStrategy": "Test feedback loop by overriding candidate categories and verifying feedback storage.",
+        "details": "Implement a feedback system where users can override AI bucket assignments and provide feedback. Store feedback data for future model training.",
+        "testStrategy": "Test feedback submission and bucket override functionality. Verify feedback data is properly stored.",
         "priority": "medium",
         "dependencies": [
           7
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -470,7 +470,7 @@
     ],
     "metadata": {
       "created": "2025-06-21T02:23:20.634Z",
-      "updated": "2025-06-21T13:00:00.000Z",
+      "updated": "2025-06-21T13:30:00.000Z",
       "description": "Tasks for master context"
     }
   }
