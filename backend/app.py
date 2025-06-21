@@ -9,19 +9,19 @@ import fitz  # PyMuPDF
 import docx  # python-docx
 import io
 import hashlib
-import threading
 import time
-import queue
-from datetime import datetime
+from backend.tasks import process_job_resumes
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your-secret-key-here'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///resumes.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 CORS(app)  # This will enable CORS for all routes
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# --- Simple Async Queue Configuration ---
-task_queue = queue.Queue()
-worker_threads = []
-MAX_WORKERS = 2
+# Global variables for tracking job completion
+job_completion_trackers = {}  # job_id -> {total_resumes, completed_resumes}
 
 # --- Database Configuration ---
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -53,9 +53,6 @@ class Resume(db.Model):
     __table_args__ = (db.UniqueConstraint('job_id', 'filename', name='_job_filename_uc'),
                       db.UniqueConstraint('job_id', 'content_hash', name='_job_hash_uc'))
 
-# Global variables for tracking job completion
-job_completion_trackers = {}  # job_id -> {total_resumes, completed_resumes}
-
 # --- WebSocket Events ---
 @socketio.on('connect')
 def handle_connect():
@@ -82,8 +79,9 @@ def check_job_completion(job_id):
         tracker['completed_resumes'] += 1
         
         if tracker['completed_resumes'] >= tracker['total_resumes']:
-            emit_progress_update(job_id, f"All {tracker['total_resumes']} resumes processed successfully!", 'complete')
-            del job_completion_trackers[job_id]  # Clean up tracker
+            emit_progress_update(job_id, "All resumes processed successfully!", 'complete')
+            # Clean up tracker
+            del job_completion_trackers[job_id]
 
 def process_resume_with_progress(job_id, resume_file, job_description):
     """Process a single resume with progress updates"""
@@ -147,99 +145,6 @@ def process_resume_with_progress(job_id, resume_file, job_description):
         # Still check completion even on error
         check_job_completion(job_id)
         return None, str(e)
-
-def background_worker():
-    """Background worker thread that processes resume analysis tasks"""
-    while True:
-        try:
-            task = task_queue.get(timeout=1)  # 1 second timeout
-            if task is None:  # Shutdown signal
-                break
-                
-            job_id, resume_data, job_description = task
-            
-            try:
-                filename = resume_data['filename']
-                file_content = resume_data['content']
-                
-                # Update progress
-                emit_progress_update(job_id, f"Processing {filename}...", 'processing')
-                
-                # Check for duplicates
-                content_hash = hashlib.sha256(file_content.encode('utf-8')).hexdigest()
-                with app.app_context():
-                    existing_by_hash = Resume.query.filter_by(job_id=job_id, content_hash=content_hash).first()
-                    if existing_by_hash:
-                        emit_progress_update(job_id, f"Skipped {filename}: Duplicate content", 'warning')
-                        continue
-                
-                # Analyze with AI
-                emit_progress_update(job_id, f"Analyzing {filename} with AI...", 'processing')
-                analysis_text = analyze_resume_with_ai(job_description, file_content)
-                analysis_json = json.loads(analysis_text)
-                
-                # Handle case where AI returns "Name Not Found"
-                candidate_name = analysis_json.get('candidate_name', 'Not Provided')
-                if candidate_name.strip().lower() == 'name not found':
-                    candidate_name = 'Not Provided'
-
-                # Save to database
-                with app.app_context():
-                    new_resume = Resume(
-                        filename=filename,
-                        candidate_name=candidate_name,
-                        content=file_content,
-                        content_hash=content_hash,
-                        job_id=job_id,
-                        analysis=analysis_text
-                    )
-                    db.session.add(new_resume)
-                    db.session.commit()
-                
-                emit_progress_update(job_id, f"Completed analysis for {filename}", 'success')
-                
-                # Check if all resumes for this job are complete
-                check_job_completion(job_id)
-                
-            except Exception as e:
-                emit_progress_update(job_id, f"Error processing {resume_data.get('filename', 'Unknown')}: {str(e)}", 'error')
-                
-                # Still check completion even on error
-                check_job_completion(job_id)
-                
-        except queue.Empty:
-            continue
-        except Exception as e:
-            print(f"Worker thread error: {e}")
-            continue
-
-def start_workers():
-    """Start background worker threads"""
-    for i in range(MAX_WORKERS):
-        worker = threading.Thread(target=background_worker, daemon=True)
-        worker.start()
-        worker_threads.append(worker)
-    print(f"Started {MAX_WORKERS} background worker threads")
-
-# Start workers when app initializes
-start_workers()
-
-def process_resumes_async(job_id, resumes_data, job_description):
-    """Queue resumes for background processing"""
-    total_resumes = len(resumes_data)
-    emit_progress_update(job_id, f"Queuing {total_resumes} resumes for background processing...", 'queued')
-    
-    # Initialize completion tracker for this job
-    job_completion_trackers[job_id] = {
-        'total_resumes': total_resumes,
-        'completed_resumes': 0
-    }
-    
-    # Add each resume to the queue
-    for resume_data in resumes_data:
-        task_queue.put((job_id, resume_data, job_description))
-    
-    emit_progress_update(job_id, f"All {total_resumes} resumes queued for background processing", 'queued')
 
 @app.route('/api/analyze', methods=['POST'])
 def analyze_resumes():
@@ -310,8 +215,14 @@ def analyze_resumes():
             'skipped_files': [{'filename': f.filename, 'reason': 'Invalid file'} for f in resumes if f]
         })
 
-    # Queue background job
-    process_resumes_async(job.id, resumes_data, job_description)
+    # Initialize completion tracker for this job
+    job_completion_trackers[job.id] = {
+        'total_resumes': len(resumes_data),
+        'completed_resumes': 0
+    }
+
+    # Queue background job using Celery
+    process_job_resumes.delay(job.id, resumes_data, job_description)
 
     return jsonify({
         'message': f'Queued {len(resumes_data)} resumes for background processing',
