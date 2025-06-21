@@ -123,6 +123,11 @@ def process_resume_with_progress(job_id, resume_file, job_description):
         analysis_text = analyze_resume_with_ai(job_description, content)
         analysis_json = json.loads(analysis_text)
         
+        # Handle case where AI returns "Name Not Found"
+        candidate_name = analysis_json.get('candidate_name', 'Not Provided')
+        if candidate_name.strip().lower() == 'name not found':
+            candidate_name = 'Not Provided'
+
         emit_progress_update(job_id, f"Completed analysis for {filename}", 'success')
         
         # Check if all resumes for this job are complete
@@ -130,7 +135,7 @@ def process_resume_with_progress(job_id, resume_file, job_description):
         
         return {
             'filename': filename,
-            'candidate_name': analysis_json.get('candidate_name', 'Not Provided'),
+            'candidate_name': candidate_name,
             'content': content,
             'content_hash': content_hash,
             'analysis': analysis_text
@@ -173,11 +178,16 @@ def background_worker():
                 analysis_text = analyze_resume_with_ai(job_description, file_content)
                 analysis_json = json.loads(analysis_text)
                 
+                # Handle case where AI returns "Name Not Found"
+                candidate_name = analysis_json.get('candidate_name', 'Not Provided')
+                if candidate_name.strip().lower() == 'name not found':
+                    candidate_name = 'Not Provided'
+
                 # Save to database
                 with app.app_context():
                     new_resume = Resume(
                         filename=filename,
-                        candidate_name=analysis_json.get('candidate_name', 'Not Provided'),
+                        candidate_name=candidate_name,
                         content=file_content,
                         content_hash=content_hash,
                         job_id=job_id,

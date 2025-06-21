@@ -28,7 +28,7 @@ Analyze the following resume against the provided job description and return a J
 Your entire response MUST be a single JSON object. Do not include any text outside of this JSON.
 The JSON must have the following structure:
 {{
-  "candidate_name": "The full name of the candidate as extracted from the resume. If the name is not found, you MUST return the string 'Name Not Found'.",
+  "candidate_name": "The full name of the candidate as extracted from the resume. Make a best effort to find the name. If it is truly not available, return 'Name Not Found'.",
   "fit_score": "An integer from 0-100 representing the candidate's overall fit for the role.",
   "bucket": "A string categorizing the candidate. Choose from: '🚀 Green-Room Rocket' (top-tier, >90), '⚡ Book-the-Call' (strong candidate, 80-89), '🛠️ Bench Prospect' (potential but with gaps, 65-79), or '🗄️ Swipe-Left Archive' (not a fit, <65).",
   "reasoning": "A concise, one-sentence explanation for the assigned bucket and score.",
