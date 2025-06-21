@@ -1,0 +1,70 @@
+# Lessons Learned - TalentVibe Development
+
+## Task 7: Display Results in Web UI - Name Extraction Issues
+
+### Issue: Candidate Name Extraction Failing
+**Problem**: The AI was not properly extracting candidate names from resumes, resulting in "Not provided" or "Unknown" values in the UI.
+
+**Root Cause**: 
+1. AI prompt was too strict and would return "Name Not Found" when uncertain
+2. Backend fallback logic was not properly handling the AI's "Name Not Found" response
+3. Database was storing literal "Name Not Found" strings instead of user-friendly fallbacks
+
+**Solution Applied**:
+1. **Improved AI Prompt**: Modified the prompt in `ai_service.py` to be more flexible:
+   - Changed from strict "MUST return 'Name Not Found'" to "Make a best effort to find the name"
+   - Added guidance for when to use "Name Not Found"
+
+2. **Enhanced Backend Logic**: Updated `app.py` to handle edge cases:
+   - Added explicit check for "Name Not Found" string from AI
+   - Replace with user-friendly "Not Provided" before database storage
+   - Improved fallback logic
+
+3. **Database Consistency**: Ensured consistent naming across the application
+
+### Key Lessons:
+
+#### 1. AI Prompt Engineering
+- **Lesson**: Be careful with overly strict AI prompts that can cause the AI to fail too easily
+- **Best Practice**: Use "best effort" language rather than strict failure conditions
+- **Action**: Always test AI prompts with various input types before deployment
+
+#### 2. Error Handling Patterns
+- **Lesson**: The same issue occurred twice, indicating a pattern in our development approach
+- **Root Cause**: We tend to make AI prompts too rigid when trying to ensure consistent output
+- **Best Practice**: Start with flexible prompts and add constraints only when necessary
+
+#### 3. Database Design
+- **Lesson**: Always consider what the user will see in the UI when designing database fallbacks
+- **Best Practice**: Use user-friendly fallback values ("Not Provided") rather than technical ones ("Name Not Found")
+
+#### 4. Testing Strategy
+- **Lesson**: Name extraction issues are not immediately obvious in development
+- **Best Practice**: Always test with real resume data that has various name formats
+- **Action**: Create test cases with different name formats (first only, full name, initials, etc.)
+
+### Technical Insights:
+
+#### AI Service Integration
+- **Pattern**: AI responses should be validated and sanitized before database storage
+- **Implementation**: Always have a validation layer between AI output and database input
+
+#### Frontend-Backend Communication
+- **Lesson**: Real-time updates work well with WebSocket integration
+- **Success**: The completion tracking system effectively notifies users when processing is done
+
+### Future Recommendations:
+
+1. **Create AI Response Validation Layer**: Implement a dedicated service to validate and sanitize AI responses
+2. **Add Comprehensive Testing**: Create test suite for name extraction with various resume formats
+3. **Document AI Prompt Patterns**: Maintain a library of effective AI prompts for different use cases
+4. **Implement Monitoring**: Add logging to track AI response patterns and identify issues early
+
+### Task Completion Notes:
+- **Task 7**: Successfully completed with improved name extraction
+- **Status**: All subtasks marked as done
+- **Next**: Ready to proceed to Task 8 (Multi-Job & Multi-Tenant Support)
+
+---
+*Last Updated: 2025-06-21*
+*Documented by: Development Team* 
