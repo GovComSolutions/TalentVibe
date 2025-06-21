@@ -3,8 +3,8 @@ import './Footer.css';
 
 function Footer() {
   return (
-    <footer className="app-footer">
-      <p>&copy; {new Date().getFullYear()} AI Résumé Sorter. All rights reserved.</p>
+    <footer className="footer">
+      <p>&copy; {new Date().getFullYear()} TalentVibe. All rights reserved.</p>
     </footer>
   );
 }

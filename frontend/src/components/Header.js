@@ -1,25 +1,22 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import './Header.css';
 
-function Header() {
-  return (
-    <header className="app-header">
-      <div className="logo">
-        <Link to="/">AI Résumé Sorter</Link>
-      </div>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/upload">Upload</Link>
-          </li>
-        </ul>
-      </nav>
-    </header>
-  );
-}
+const Header = () => {
+    return (
+        <header className="header">
+            <div className="header-content">
+                <NavLink to="/" className="header-logo">
+                    <h2>TalentVibe</h2>
+                </NavLink>
+                <nav className="header-nav">
+                    <NavLink to="/" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>Home</NavLink>
+                    <NavLink to="/upload" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>Upload</NavLink>
+                    <NavLink to="/jobs" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>Jobs</NavLink>
+                </nav>
+            </div>
+        </header>
+    );
+};
 
 export default Header; 

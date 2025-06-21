@@ -1,0 +1,266 @@
+.jobs-page-container {
+    width: 100%;
+}
+
+.jobs-page-container h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.job-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.5rem;
+}
+
+.job-card h3 {
+    font-size: 1.1rem;
+    margin: 0 0 1rem 0;
+    line-height: 1.4;
+    color: #fff;
+    flex-grow: 1;
+}
+
+.job-card-meta {
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-color-dark);
+}
+
+.details-button {
+    align-self: flex-start;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--primary-color);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.details-button:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.back-link:hover {
+    color: var(--primary-color);
+}
+
+/* Styles for JobDetailsPage */
+.job-details-container {
+    width: 100%;
+}
+
+.job-summary-card, .detailed-resume-card {
+    margin-bottom: 2rem;
+}
+
+/* Candidate Summary Table */
+.candidate-summary-table {
+    overflow-x: auto;
+}
+
+.candidate-summary-table table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.candidate-summary-table th, .candidate-summary-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--glass-border-color);
+}
+
+.candidate-summary-table th {
+    font-size: 0.9rem;
+    color: var(--text-color-dark);
+    font-weight: 600;
+}
+
+.candidate-summary-table td {
+    font-size: 0.95rem;
+}
+
+.score-badge {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+.score-badge.large {
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+
+.score-badge.high { background: linear-gradient(135deg, #23d5ab, #19a585); }
+.score-badge.medium-high { background: linear-gradient(135deg, #23a6d5, #1985a5); }
+.score-badge.medium { background: linear-gradient(135deg, #ee7752, #e73c7e); }
+.score-badge.low { background: linear-gradient(135deg, #898989, #5c5c5c); }
+
+
+/* Detailed Analysis Cards */
+.detailed-resumes-list h3 {
+    margin-top: 3rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--glass-border-color);
+}
+
+.detailed-resume-card {
+    padding: 2rem;
+}
+
+.detailed-resume-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--glass-border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.detailed-resume-header h3 {
+    margin: 0;
+    font-size: 2rem;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+
+.reasoning {
+    font-style: italic;
+    color: var(--text-color-dark);
+    text-align: center;
+    margin: -0.5rem 0 1.5rem 0;
+}
+
+.summary-points, .timeline, .logistics, .skill-matrix {
+    margin-bottom: 1.5rem;
+}
+
+.summary-points h4, .timeline h4, .logistics h4 {
+    margin-bottom: 0.75rem;
+    color: #fff;
+    border-bottom: 1px solid var(--glass-border-color);
+    padding-bottom: 0.5rem;
+}
+
+.summary-points ul, .timeline ul, .logistics ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.summary-points li, .timeline li, .logistics li {
+    padding: 0.5rem 0;
+    line-height: 1.6;
+}
+
+/* Skill Matrix */
+.skill-matrix {
+    border-top: 1px solid var(--glass-border-color);
+    padding-top: 1.5rem;
+    display: flex;
+    gap: 2rem;
+}
+
+.skill-column {
+    flex: 1;
+}
+
+.skill-column h4 {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+}
+.skill-column.matches h4 { color: #23d5ab; }
+.skill-column.gaps h4 { color: #e73c7e; }
+
+.skill-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.skill-column li {
+    background-color: rgba(0,0,0,0.2);
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.resumes-list h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.resume-card {
+    background-color: rgba(0,0,0,0.15);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border-color);
+    transition: transform 0.2s ease-in-out;
+}
+.resume-card:hover {
+    transform: scale(1.02);
+}
+
+.resume-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.resume-header h4 {
+    margin: 0;
+    color: #fff;
+}
+
+.resume-score {
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+}
+
+.resume-score.high { background: linear-gradient(90deg, #00C9FF, #92FE9D); color: #004d00; }
+.resume-score.medium { background: linear-gradient(90deg, #FFDDE1, #EE9CA7); color: #5d2f2f; }
+.resume-score.low { background: linear-gradient(90deg, #898989, #5c5c5c); color: #fff; }
+
+
+.resume-summary p, .resume-skills p {
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+}
+
+.resume-skills {
+    margin-top: 1rem;
+} 

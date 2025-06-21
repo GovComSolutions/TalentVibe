@@ -1,49 +1,161 @@
-.upload-container {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.upload-page-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 
-.upload-form .form-group {
-  margin-bottom: 1.5rem;
+.upload-page-container h2 {
+    text-align: center;
+}
+.upload-page-container p {
+    text-align: center;
+    color: var(--text-color-dark);
+    margin-top: -0.5rem;
+    margin-bottom: 2rem;
 }
 
-.upload-form label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-  text-align: left;
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.upload-form textarea,
-.upload-form input[type="file"] {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
+.form-group {
+    display: flex;
+    flex-direction: column;
 }
 
-.upload-form textarea {
-  min-height: 200px;
-  resize: vertical;
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #fff;
 }
 
-.submit-btn {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
+.form-group textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: var(--text-color);
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border-color);
+    border-radius: 10px;
+    resize: vertical;
+    transition: all 0.2s ease;
 }
 
-.submit-btn:hover {
-  background-color: #0056b3;
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 170, 255, 0.3);
+}
+
+.drop-zone {
+    border: 2px dashed var(--glass-border-color);
+    border-radius: 10px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.drop-zone:hover,
+.drop-zone.dragging {
+    border-color: var(--primary-color);
+    background-color: rgba(0, 170, 255, 0.1);
+}
+
+.drop-zone-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.drop-zone-icon {
+    font-size: 3rem;
+}
+
+.drop-zone-prompt p {
+    margin: 0.5rem 0 0;
+    color: var(--text-color-dark);
+}
+.drop-zone-prompt .file-types {
+    font-size: 0.8rem;
+}
+
+.file-list {
+    margin-top: 1rem;
+    background-color: rgba(0,0,0,0.2);
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+.file-list h4 {
+    margin: 0 0 0.5rem 0;
+    color: #fff;
+}
+
+.file-list ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.file-list li {
+    padding: 0.25rem 0;
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    align-self: center;
+}
+
+.cta-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.cta-button:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.message {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.message.success {
+    background-color: rgba(0, 255, 128, 0.1);
+    color: #00ff80;
+    border: 1px solid rgba(0, 255, 128, 0.2);
+}
+
+.message.error {
+    background-color: rgba(255, 0, 85, 0.1);
+    color: #ff0055;
+    border: 1px solid rgba(255, 0, 85, 0.2);
 } 

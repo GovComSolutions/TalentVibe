@@ -1,20 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import './HomePage.css';
 
 function HomePage() {
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    fetch('http://localhost:5000/api/data')
-      .then(res => res.json())
-      .then(data => setMessage(data.message))
-      .catch(err => console.error(err));
-  }, []);
-
   return (
-    <div>
-      <h1>Home Page</h1>
-      <p>Welcome to the AI Résumé Sorter!</p>
-      <p><strong>Message from backend:</strong> {message}</p>
+    <div className="homepage-container">
+      <div className="glass-container homepage-content">
+        <h1 className="homepage-title">
+          Hire Smarter, Not Harder.
+        </h1>
+        <p className="homepage-subtitle">
+          Welcome to <strong>TalentVibe</strong>. Our AI-powered platform intelligently analyzes and ranks résumés based on your job descriptions, helping you find the perfect candidate in record time.
+        </p>
+        <Link to="/upload" className="cta-button">
+          Get Started Now
+        </Link>
+      </div>
     </div>
   );
 }
