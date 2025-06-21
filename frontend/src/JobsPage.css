@@ -49,8 +49,9 @@
 }
 
 .details-button:hover {
-    background: var(--secondary-color);
+    background: linear-gradient(135deg, #23a6d5, #1985a5);
     transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(35, 166, 213, 0.4);
 }
 
 .back-link {
@@ -298,4 +299,39 @@
 
 .resume-skills {
     margin-top: 1rem;
+}
+
+.job-card-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.delete-button {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    min-width: 100px;
+}
+
+.delete-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+}
+
+.delete-button:disabled {
+    background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 } 

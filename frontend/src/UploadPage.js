@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import io from 'socket.io-client';
 import './UploadPage.css';
 
 const UploadPage = () => {
@@ -9,7 +10,41 @@ const UploadPage = () => {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [analysisResult, setAnalysisResult] = useState(null);
+    const [progressUpdates, setProgressUpdates] = useState([]);
+    const [currentJobId, setCurrentJobId] = useState(null);
     const navigate = useNavigate();
+    const socketRef = useRef(null);
+
+    // Initialize WebSocket connection
+    useEffect(() => {
+        socketRef.current = io('http://127.0.0.1:5000');
+        
+        socketRef.current.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+        socketRef.current.on('progress_update', (data) => {
+            console.log('Progress update:', data);
+            setProgressUpdates(prev => [...prev, data]);
+            
+            // Auto-navigate when analysis is complete
+            if (data.type === 'complete' && currentJobId) {
+                setTimeout(() => {
+                    navigate(`/jobs/${currentJobId}`);
+                }, 2000);
+            }
+        });
+
+        socketRef.current.on('disconnect', () => {
+            console.log('Disconnected from server');
+        });
+
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+            }
+        };
+    }, [navigate, currentJobId]);
 
     const handleFileChange = (e) => {
         if (e.target.files) {
@@ -48,6 +83,7 @@ const UploadPage = () => {
         setIsAnalyzing(true);
         setAnalysisResult(null);
         setMessage('');
+        setProgressUpdates([]);
 
         setTimeout(async () => {
             const formData = new FormData();
@@ -64,12 +100,10 @@ const UploadPage = () => {
 
                 const data = await response.json();
                 setAnalysisResult(data);
+                setCurrentJobId(data.job_id);
 
                 if (response.ok) {
-                    setMessage(`Analysis Complete: ${data.processed_files?.length || 0} processed, ${data.skipped_files?.length || 0} skipped.`);
-                    setTimeout(() => {
-                        navigate(`/jobs/${data.job_id}`);
-                    }, 2000);
+                    setMessage(`Analysis queued successfully! ${data.total_resumes} resumes are being processed in the background. You'll be redirected when complete.`);
                 } else {
                     throw new Error(data.error || 'An error occurred during analysis.');
                 }
@@ -78,6 +112,16 @@ const UploadPage = () => {
                 setIsAnalyzing(false);
             }
         }, 100);
+    };
+
+    const getProgressTypeClass = (type) => {
+        switch (type) {
+            case 'success': return 'progress-success';
+            case 'error': return 'progress-error';
+            case 'warning': return 'progress-warning';
+            case 'processing': return 'progress-processing';
+            default: return 'progress-info';
+        }
     };
 
     return (
@@ -134,6 +178,24 @@ const UploadPage = () => {
                         </span>
                     </button>
                 </form>
+                
+                {/* Real-time Progress Updates */}
+                {isAnalyzing && progressUpdates.length > 0 && (
+                    <div className="progress-updates">
+                        <h4>Analysis Progress</h4>
+                        <div className="progress-list">
+                            {progressUpdates.map((update, index) => (
+                                <div key={index} className={`progress-item ${getProgressTypeClass(update.type)}`}>
+                                    <span className="progress-message">{update.message}</span>
+                                    <span className="progress-time">
+                                        {new Date(update.timestamp * 1000).toLocaleTimeString()}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+                
                 {message && <p className={`message ${message.startsWith('Error') ? 'error' : 'success'}`}>{message}</p>}
                 
                 {analysisResult && analysisResult.skipped_files && analysisResult.skipped_files.length > 0 && (

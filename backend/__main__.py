@@ -9,9 +9,12 @@ dotenv_path = os.path.join(project_root, '.env')
 load_dotenv(dotenv_path=dotenv_path)
 
 # Now that the environment is loaded, import the app.
-from backend.app import app, db
+from backend.app import app, db, socketio
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    serve(app, host='0.0.0.0', port=5000) 
+    
+    # Use SocketIO for development (supports WebSockets)
+    # For production, you might want to use waitress with a separate WebSocket server
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True) 
