@@ -11,6 +11,7 @@ import io
 import hashlib
 import time
 from backend.tasks import process_job_resumes
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-here'
@@ -52,6 +53,34 @@ class Resume(db.Model):
 
     __table_args__ = (db.UniqueConstraint('job_id', 'filename', name='_job_filename_uc'),
                       db.UniqueConstraint('job_id', 'content_hash', name='_job_hash_uc'))
+
+class Feedback(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    resume_id = db.Column(db.Integer, db.ForeignKey('resume.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    original_bucket = db.Column(db.String(50), nullable=False)
+    suggested_bucket = db.Column(db.String(50), nullable=True)
+    feedback_type = db.Column(db.String(20), nullable=False)  # 'override', 'correction', 'improvement'
+    feedback_text = db.Column(db.Text, nullable=True)
+    confidence_score = db.Column(db.Float, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    resume = db.relationship('Resume', backref='feedbacks')
+    user = db.relationship('User', backref='feedbacks')
+
+class BucketOverride(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    resume_id = db.Column(db.Integer, db.ForeignKey('resume.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    original_bucket = db.Column(db.String(50), nullable=False)
+    new_bucket = db.Column(db.String(50), nullable=False)
+    reason = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    resume = db.relationship('Resume', backref='bucket_overrides')
+    user = db.relationship('User', backref='bucket_overrides')
 
 # --- WebSocket Events ---
 @socketio.on('connect')
@@ -313,6 +342,199 @@ def delete_job(job_id):
 @app.route('/api/data')
 def get_data():
     return jsonify({'message': 'Hello from the Flask backend!'})
+
+# --- Feedback Loop API Endpoints ---
+
+@app.route('/api/feedback', methods=['POST'])
+def submit_feedback():
+    """Submit feedback for a resume analysis"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    data = request.get_json()
+    
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+    
+    required_fields = ['resume_id', 'original_bucket', 'feedback_type']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'error': f'Missing required field: {field}'}), 400
+    
+    # Verify resume exists and belongs to user
+    resume = Resume.query.filter_by(id=data['resume_id']).first()
+    if not resume:
+        return jsonify({'error': 'Resume not found'}), 404
+    
+    # Check if resume belongs to user's job
+    if resume.job.user_id != default_user.id:
+        return jsonify({'error': 'Unauthorized access to resume'}), 403
+    
+    try:
+        feedback = Feedback(
+            resume_id=data['resume_id'],
+            user_id=default_user.id,
+            original_bucket=data['original_bucket'],
+            suggested_bucket=data.get('suggested_bucket'),
+            feedback_type=data['feedback_type'],
+            feedback_text=data.get('feedback_text'),
+            confidence_score=data.get('confidence_score')
+        )
+        
+        db.session.add(feedback)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Feedback submitted successfully',
+            'feedback_id': feedback.id
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to submit feedback: {str(e)}'}), 500
+
+@app.route('/api/feedback/<int:resume_id>', methods=['GET'])
+def get_resume_feedback(resume_id):
+    """Get all feedback for a specific resume"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    # Verify resume exists and belongs to user
+    resume = Resume.query.filter_by(id=resume_id).first()
+    if not resume:
+        return jsonify({'error': 'Resume not found'}), 404
+    
+    if resume.job.user_id != default_user.id:
+        return jsonify({'error': 'Unauthorized access to resume'}), 403
+    
+    feedbacks = Feedback.query.filter_by(resume_id=resume_id).order_by(Feedback.created_at.desc()).all()
+    
+    return jsonify([{
+        'id': f.id,
+        'original_bucket': f.original_bucket,
+        'suggested_bucket': f.suggested_bucket,
+        'feedback_type': f.feedback_type,
+        'feedback_text': f.feedback_text,
+        'confidence_score': f.confidence_score,
+        'created_at': f.created_at.isoformat()
+    } for f in feedbacks])
+
+@app.route('/api/override', methods=['POST'])
+def submit_override():
+    """Submit a bucket override for a resume"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    data = request.get_json()
+    
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+    
+    required_fields = ['resume_id', 'original_bucket', 'new_bucket', 'reason']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'error': f'Missing required field: {field}'}), 400
+    
+    # Verify resume exists
+    resume = Resume.query.get(data['resume_id'])
+    if not resume:
+        return jsonify({'error': 'Resume not found'}), 404
+    
+    try:
+        # Create override record
+        override = BucketOverride(
+            resume_id=data['resume_id'],
+            user_id=default_user.id,  # --- Temp: Use default user ---
+            original_bucket=data['original_bucket'],
+            new_bucket=data['new_bucket'],
+            reason=data['reason'],
+            timestamp=datetime.utcnow()
+        )
+        
+        db.session.add(override)
+        db.session.commit()
+        
+        return jsonify({'message': 'Override submitted successfully', 'override_id': override.id}), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to save override: {str(e)}'}), 500
+
+@app.route('/api/override/<int:resume_id>', methods=['GET'])
+def get_resume_overrides(resume_id):
+    """Get all bucket overrides for a specific resume"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    # Verify resume exists and belongs to user
+    resume = Resume.query.filter_by(id=resume_id).first()
+    if not resume:
+        return jsonify({'error': 'Resume not found'}), 404
+    
+    if resume.job.user_id != default_user.id:
+        return jsonify({'error': 'Unauthorized access to resume'}), 403
+    
+    overrides = BucketOverride.query.filter_by(resume_id=resume_id).order_by(BucketOverride.created_at.desc()).all()
+    
+    return jsonify([{
+        'id': o.id,
+        'original_bucket': o.original_bucket,
+        'new_bucket': o.new_bucket,
+        'reason': o.reason,
+        'created_at': o.created_at.isoformat()
+    } for o in overrides])
+
+@app.route('/api/feedback/stats', methods=['GET'])
+def get_feedback_stats():
+    """Get feedback statistics for the current user"""
+    # --- Temp: Use default user ---
+    default_user = User.query.filter_by(username='default_user').first()
+    if not default_user:
+        return jsonify({'error': 'User not found'}), 404
+    # --- End Temp ---
+
+    try:
+        # Get total feedback count
+        total_feedback = Feedback.query.filter_by(user_id=default_user.id).count()
+        
+        # Get feedback by type
+        feedback_by_type = db.session.query(
+            Feedback.feedback_type,
+            db.func.count(Feedback.id)
+        ).filter_by(user_id=default_user.id).group_by(Feedback.feedback_type).all()
+        
+        # Get bucket override count
+        total_overrides = BucketOverride.query.filter_by(user_id=default_user.id).count()
+        
+        # Get most common original buckets that get overridden
+        common_overrides = db.session.query(
+            BucketOverride.original_bucket,
+            db.func.count(BucketOverride.id)
+        ).filter_by(user_id=default_user.id).group_by(BucketOverride.original_bucket).order_by(
+            db.func.count(BucketOverride.id).desc()
+        ).limit(5).all()
+        
+        return jsonify({
+            'total_feedback': total_feedback,
+            'feedback_by_type': dict(feedback_by_type),
+            'total_overrides': total_overrides,
+            'common_overrides': dict(common_overrides)
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to get feedback stats: {str(e)}'}), 500
 
 @app.route('/')
 def home():

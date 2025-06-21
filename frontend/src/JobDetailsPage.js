@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import FeedbackModal from './components/FeedbackModal';
 import './JobsPage.css';
 
 const SkillMatrix = ({ skills }) => (
@@ -50,6 +51,8 @@ const JobDetailsPage = () => {
     const [selectedResumeId, setSelectedResumeId] = useState(null);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+    const [selectedResumeForFeedback, setSelectedResumeForFeedback] = useState(null);
     const detailsRef = useRef(null);
 
     useEffect(() => {
@@ -99,6 +102,38 @@ const JobDetailsPage = () => {
     const handleRowClick = (resumeId) => {
         const newId = selectedResumeId === resumeId ? null : resumeId;
         setSelectedResumeId(newId);
+    };
+
+    const handleFeedbackClick = (resume) => {
+        setSelectedResumeForFeedback(resume);
+        setIsFeedbackModalOpen(true);
+    };
+
+    const handleFeedbackSubmit = () => {
+        // Refresh job details to show any updates
+        window.location.reload();
+    };
+
+    const handleOverrideSubmit = (newBucket) => {
+        // Update the local state to reflect the override
+        if (selectedResumeForFeedback) {
+            const updatedResume = {
+                ...selectedResumeForFeedback,
+                analysis: {
+                    ...selectedResumeForFeedback.analysis,
+                    bucket: newBucket
+                }
+            };
+            setSelectedResumeForFeedback(updatedResume);
+            
+            // Update the job details
+            setJobDetails(prev => ({
+                ...prev,
+                resumes: prev.resumes.map(r => 
+                    r.id === selectedResumeForFeedback.id ? updatedResume : r
+                )
+            }));
+        }
     };
 
     const getScoreClass = (score) => {
@@ -170,9 +205,17 @@ const JobDetailsPage = () => {
                                 </div>
                                 <h3 className="candidate-name">{selectedResume.candidate_name || selectedResume.filename}</h3>
                             </div>
-                            <span className={`score-badge large ${getScoreClass(selectedResume.analysis?.fit_score)}`}>
-                                FIT SCORE: {selectedResume.analysis?.fit_score || 'N/A'} / 100
-                            </span>
+                            <div className="header-actions">
+                                <button 
+                                    className="feedback-button"
+                                    onClick={() => handleFeedbackClick(selectedResume)}
+                                >
+                                    💬 Provide Feedback
+                                </button>
+                                <span className={`score-badge large ${getScoreClass(selectedResume.analysis?.fit_score)}`}>
+                                    FIT SCORE: {selectedResume.analysis?.fit_score || 'N/A'} / 100
+                                </span>
+                            </div>
                         </div>
                         <p className="reasoning">{selectedResume.analysis?.reasoning}</p>
                         <div className="summary-points">
@@ -187,6 +230,14 @@ const JobDetailsPage = () => {
                     </div>
                 </div>
             )}
+
+            <FeedbackModal
+                isOpen={isFeedbackModalOpen}
+                onClose={() => setIsFeedbackModalOpen(false)}
+                resume={selectedResumeForFeedback}
+                onSubmitFeedback={handleFeedbackSubmit}
+                onSubmitOverride={handleOverrideSubmit}
+            />
         </div>
     );
 };
