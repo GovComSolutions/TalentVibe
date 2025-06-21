@@ -1,0 +1,84 @@
+<context>
+# Overview
+We're building an AI résumé-intelligence platform that drops screening time from hours to minutes, slashes bias risk, and integrates seamlessly with any ATS. Our north-star metric: **cut average time-to-first-interview by 70%** for enterprise recruiting teams.
+
+# Core Features
+- **Multi-Job Management:** Create and manage distinct `Job` requisitions, each with its own candidate pool and analysis results.
+- **Résumé Ingestion:** Upload résumés via a web UI or API, with support for PDF, DOCX, and other formats.
+- **AI-Powered Categorization:** Automatically sort candidates into customizable buckets (e.g., Fast Track, Strong Match, Not a Fit) based on deep comparison with the job description.
+- **Explainable AI (XAI):** Provide concise, evidence-based reasons for each categorization, citing specific skills and experiences from the résumé text.
+- **Bias & Compliance Dashboard:** Monitor for potential bias with statistical analysis and offer audit logs for compliance with EEOC, GDPR, and the EU AI Act.
+- **PII De-identification:** Anonymize résumés by stripping names, photos, and other identifiable information before analysis to ensure fairness.
+- **Feedback Loop:** Allow hiring managers to manually override AI-generated buckets, providing feedback that fine-tunes the model over time.
+- **Automated Actions:** Trigger next steps based on categorization, such as sending templated rejection emails or pushing "Fast Track" candidates to scheduling or ATS stages.
+
+# User Experience
+- **Primary Personas:** Enterprise recruiters, hiring managers, and compliance officers.
+- **Key User Flow:**
+    1.  User logs into the web platform.
+    2.  User creates a new `Job` and provides the description.
+    3.  User bulk-uploads résumés to that job. The upload is asynchronous.
+    4.  As résumés are processed, the candidate list populates in real-time with their bucket, rank, and explanation.
+    5.  User can filter the list, review explanations, and override buckets.
+    6.  User can trigger automated actions (e.g., "Schedule all Fast Track interviews").
+    7.  User reviews the bias dashboard for the job posting.
+</context>
+<PRD>
+# Target Technical Architecture
+- **Service Decomposition:**
+    - **Web App:** A React-based frontend.
+    - **API Gateway:** A central entry point for all client requests (Web UI, external APIs).
+    - **Parser Service:** A dedicated microservice for text extraction from various file formats (e.g., using AWS Textract or Tika).
+    - **Embedding & Retrieval Service:** A vector database (e.g., ChromaDB, FAISS) to pre-filter candidates via semantic search.
+    - **LLM Ranking Service:** A service that orchestrates calls to LLMs for the final, detailed analysis on pre-filtered candidates.
+- **Scalability & Processing:**
+    - **Asynchronous Job Queue:** An event-driven system (e.g., using Celery with RabbitMQ/Redis, or AWS SQS) to handle résumé processing asynchronously.
+    - **Containerization & Orchestration:** All services will be containerized with Docker and deployed on Kubernetes for autoscaling.
+- **Security & Data Privacy:**
+    - **Encryption:** All résumé data encrypted at rest (AES-256) and in transit (TLS 1.2+).
+    - **Data Retention:** Configurable policies for automatic data purging to comply with privacy regulations.
+
+# Development Roadmap
+
+## Phase I: The MVP - A Usable Web Platform
+*Goal: Create a functional, single-user web application that proves the core value proposition.*
+1.  **UI Foundation:** Develop a basic web interface using React for a polished user experience from the start.
+2.  **Monolithic Backend:** Create a single Python (Flask/FastAPI) backend to handle initial logic.
+3.  **Core Workflow:**
+    - Allow a user to paste a single job description.
+    - Implement bulk résumé upload (PDF only for MVP).
+    - Process uploads synchronously for the MVP.
+4.  **AI Analysis:** Integrate with a single LLM API to perform the four-bucket categorization.
+5.  **Evidence-Based Reasons:** Implement a structured explanation schema (e.g., matched/missing skills).
+6.  **Display Results:** Render the ranked, categorized list of candidates clearly in the web UI.
+
+## Phase II: Enterprise Readiness & Scalability
+*Goal: Evolve from a single-user tool to a multi-tenant, scalable platform.*
+1.  **Multi-Job & Multi-Tenant:** Introduce `Job` and `User` objects to the data model. Users can now manage multiple jobs in parallel.
+2.  **Asynchronous Processing:** Refactor the backend to use a job queue (e.g., Celery/SQS) for non-blocking résumé processing.
+3.  **Microservice Decomposition:** Begin breaking out the backend into separate services (Parser, API Gateway, Ranking Service).
+4.  **Security Foundations:** Implement user authentication (OAuth) and encrypt all résumé data at rest.
+5.  **Initial Deployment:** Containerize the application services using Docker.
+
+## Phase III: Trust, Compliance & Feedback
+*Goal: Build features that create user trust and address critical compliance needs.*
+1.  **Feedback Loop:** Implement functionality for users to override a candidate's bucket and provide a reason, capturing this data for future model fine-tuning.
+2.  **Bias & Compliance V1:**
+    - Create a basic bias-monitoring dashboard.
+    - Implement a PII de-identification mode.
+    - Add data retention policies (e.g., auto-purge after 90 days).
+3.  **ATS Integration V1:** Build the first ATS integration (e.g., Greenhouse) for pushing candidates.
+
+## Phase IV: Automation & "Billion-Dollar" Differentiators
+*Goal: Move from analysis to action, and begin building a competitive moat.*
+1.  **Automated Actions:** Allow users to configure rules to trigger actions (e.g., auto-email "Not a Fit" candidates).
+2.  **Real-time Scheduling:** Integrate with Calendly or Google Calendar API to directly schedule interviews for "Fast Track" candidates.
+3.  **Advanced Analytics:** Introduce a marketplace data network to provide anonymized skill demand and salary trends.
+4.  **Certification:** Begin the process for ISO/IEC 42001 AI management standard certification.
+
+# Risks and Mitigations
+- **Regulatory Risk:** (NYC Local Law 144, EU AI Act) Mitigation: Build compliance features (audit logs, fairness dashboards) from Phase III. Partner with legal counsel.
+- **Model Trust:** (Managers fear missing "hidden gems") Mitigation: Emphasize transparent, evidence-based explanations and the human-in-the-loop override feature.
+- **Cost/Latency:** (Per-résumé LLM calls are expensive/slow) Mitigation: Introduce a vector DB for cheaper pre-filtering in Phase II and explore fine-tuning smaller models in later phases.
+- **Data Privacy:** (Handling sensitive PII) Mitigation: Implement strong encryption, data retention policies, and PII-stripping features from the outset.
+</PRD> 

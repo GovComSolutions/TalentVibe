@@ -1,0 +1,438 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup Project Repository",
+        "description": "Initialize the project repository for the AI résumé-intelligence platform.",
+        "details": "Create a new Git repository. Set up the initial project structure with directories for frontend, backend, and documentation. Initialize package.json for the frontend and requirements.txt for the backend.",
+        "testStrategy": "Verify repository setup by cloning it to a different location and ensuring all initial files and directories are present.",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Develop UI Foundation",
+        "description": "Create a basic web interface using React for a polished user experience.",
+        "details": "Set up a React project using Create React App. Implement a basic layout with navigation and placeholder components for key features like job management and résumé upload.",
+        "testStrategy": "Perform manual testing to ensure the UI loads correctly and navigation between components works as expected.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up React project",
+            "description": "Initialize a new React project using Create React App or another preferred method.",
+            "dependencies": [],
+            "details": "Use Create React App to scaffold a new project, ensuring all necessary dependencies are installed.",
+            "status": "done"
+          },
+          {
+            "id": 2,
+            "title": "Create navigation structure",
+            "description": "Implement a basic navigation structure for the React application.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use React Router or a similar library to set up navigation between different pages or components.",
+            "status": "done"
+          },
+          {
+            "id": 3,
+            "title": "Implement header component",
+            "description": "Create a placeholder header component to be used across the application.",
+            "dependencies": [
+              1
+            ],
+            "details": "Design a simple header component with placeholder text or logo, ensuring it is reusable.",
+            "status": "done"
+          },
+          {
+            "id": 4,
+            "title": "Implement footer component",
+            "description": "Create a placeholder footer component to be used across the application.",
+            "dependencies": [
+              1
+            ],
+            "details": "Design a simple footer component with placeholder text or links, ensuring it is reusable.",
+            "status": "done"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Implement Monolithic Backend",
+        "description": "Create a single Python backend to handle initial logic using Flask or FastAPI.",
+        "details": "Set up a Flask or FastAPI project. Implement basic endpoints for job creation and résumé upload. Ensure the backend can serve the frontend application.",
+        "testStrategy": "Write unit tests for each endpoint to verify they return the expected responses.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up Project",
+            "description": "Initialize the project environment and repository.",
+            "dependencies": [],
+            "details": "Create a new repository, set up the project structure, and configure necessary tools and dependencies.",
+            "status": "done"
+          },
+          {
+            "id": 2,
+            "title": "Implement Endpoints",
+            "description": "Develop the necessary API endpoints for the project.",
+            "dependencies": [
+              1
+            ],
+            "details": "Design and code the backend API endpoints required for the application functionality.",
+            "status": "done"
+          },
+          {
+            "id": 3,
+            "title": "Test Endpoints",
+            "description": "Perform testing on the implemented API endpoints.",
+            "dependencies": [
+              2
+            ],
+            "details": "Write and execute test cases to ensure the API endpoints function correctly and handle edge cases.",
+            "status": "done"
+          },
+          {
+            "id": 4,
+            "title": "Ensure Frontend-Backend Integration",
+            "description": "Verify that the frontend and backend components work together seamlessly.",
+            "dependencies": [
+              3
+            ],
+            "details": "Test the integration between the frontend and backend, ensuring data flows correctly and the user interface updates as expected.",
+            "status": "done"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Implement Core Workflow for Job and Résumé Management",
+        "description": "Allow a user to paste a single job description and upload résumés in PDF format.",
+        "details": "Develop frontend forms for job description input and résumé upload. Implement backend logic to handle these inputs and store them in a database.",
+        "testStrategy": "Test the workflow by creating a job and uploading résumés, then verify data is correctly stored and retrievable.",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          3
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Frontend Form Development",
+            "description": "Design and implement the user interface for the form, ensuring it is responsive and user-friendly.",
+            "dependencies": [],
+            "details": "Use HTML, CSS, and JavaScript to create the form layout and functionality. Ensure compatibility across different browsers and devices.",
+            "status": "done"
+          },
+          {
+            "id": 2,
+            "title": "Backend Logic Implementation",
+            "description": "Develop the server-side logic to handle form submissions and process data.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use a backend framework (e.g., Node.js, Django) to create endpoints for form submission and data processing. Implement validation and error handling.",
+            "status": "done"
+          },
+          {
+            "id": 3,
+            "title": "Database Integration",
+            "description": "Set up a database to store form data and integrate it with the backend.",
+            "dependencies": [
+              2
+            ],
+            "details": "Choose a suitable database (e.g., MySQL, MongoDB) and design the schema. Implement CRUD operations to manage form data.",
+            "status": "done"
+          },
+          {
+            "id": 4,
+            "title": "Testing",
+            "description": "Conduct thorough testing of the form, backend logic, and database integration.",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Perform unit, integration, and user acceptance testing to ensure all components work as expected. Address any bugs or issues found.",
+            "status": "done"
+          },
+          {
+            "id": 5,
+            "title": "Complexity Analysis and Coordination",
+            "description": "Analyze the complexity of the project and ensure coordination between frontend and backend teams.",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "Review the project to identify potential bottlenecks and ensure smooth communication between teams. Adjust timelines and resources as needed.",
+            "status": "done"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Integrate AI Analysis for Candidate Categorization",
+        "description": "Integrate with a single LLM API to perform candidate categorization into buckets.",
+        "details": "Select an LLM API for integration. Implement backend logic to send résumé data to the LLM and receive categorization results. Store results in the database.",
+        "testStrategy": "Validate integration by checking if résumés are correctly categorized and results are stored.",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Select the API",
+            "description": "Research and choose the most suitable API for integration based on project requirements.",
+            "dependencies": [],
+            "details": "Consider factors such as API functionality, reliability, documentation, and cost.",
+            "status": "done"
+          },
+          {
+            "id": 2,
+            "title": "Implement API Integration",
+            "description": "Develop the code necessary to integrate the selected API into the project.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use appropriate libraries and frameworks to facilitate the integration process.",
+            "status": "done"
+          },
+          {
+            "id": 3,
+            "title": "Handle Data Flow",
+            "description": "Design and implement the data flow between the API and the project.",
+            "dependencies": [
+              2
+            ],
+            "details": "Ensure data is correctly formatted, validated, and processed as it moves between systems.",
+            "status": "done"
+          },
+          {
+            "id": 4,
+            "title": "Store Results",
+            "description": "Develop a system to store the results obtained from the API.",
+            "dependencies": [
+              3
+            ],
+            "details": "Choose an appropriate storage solution and ensure data integrity and security.",
+            "status": "done"
+          },
+          {
+            "id": 5,
+            "title": "Test Integration and Data Handling",
+            "description": "Conduct thorough testing of the API integration and data handling processes.",
+            "dependencies": [
+              4
+            ],
+            "details": "Perform unit, integration, and system testing to ensure everything works as expected.",
+            "status": "done"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Implement Evidence-Based Explanation Schema",
+        "description": "Provide structured explanations for candidate categorization based on résumé analysis.",
+        "details": "Design a schema for explanations that includes matched and missing skills. Implement logic to generate explanations using data from the LLM API.",
+        "testStrategy": "Review generated explanations for accuracy and completeness against sample résumés.",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Display Results in Web UI",
+        "description": "Render the ranked, categorized list of candidates in the web UI.",
+        "details": "Develop UI components to display candidate categories, rankings, and explanations. Ensure real-time updates as résumés are processed.",
+        "testStrategy": "Perform end-to-end testing to ensure the UI displays correct data and updates in real-time.",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Implement Multi-Job & Multi-Tenant Support",
+        "description": "Introduce 'Job' and 'User' objects to the data model for managing multiple jobs.",
+        "details": "Extend the data model to include Job and User entities. Update backend logic to support multiple jobs per user and manage user sessions.",
+        "testStrategy": "Test multi-job management by creating multiple jobs under different users and verifying data isolation.",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Set Up Asynchronous Processing",
+        "description": "Refactor backend to use a job queue for non-blocking résumé processing.",
+        "details": "Implement an asynchronous job queue using Celery with RabbitMQ or Redis. Update résumé processing logic to use the queue.",
+        "testStrategy": "Verify asynchronous processing by uploading multiple résumés and checking that processing occurs without blocking.",
+        "priority": "medium",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Containerize Application Services",
+        "description": "Containerize the application services using Docker for deployment.",
+        "details": "Create Dockerfiles for the frontend and backend services. Set up Docker Compose for local development and testing.",
+        "testStrategy": "Test containerization by building and running the services in Docker, ensuring they communicate correctly.",
+        "priority": "medium",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Implement User Authentication and Security",
+        "description": "Implement OAuth for user authentication and encrypt résumé data at rest.",
+        "details": "Integrate an OAuth provider for authentication. Implement AES-256 encryption for résumé data storage.",
+        "testStrategy": "Test authentication by logging in with different user accounts. Verify data encryption by checking database entries.",
+        "priority": "medium",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Develop Feedback Loop for Model Fine-Tuning",
+        "description": "Allow users to override candidate buckets and provide feedback for model improvement.",
+        "details": "Implement UI and backend logic for bucket overrides and feedback submission. Store feedback for future model updates.",
+        "testStrategy": "Test feedback loop by overriding candidate categories and verifying feedback storage.",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Create Bias & Compliance Dashboard",
+        "description": "Develop a dashboard to monitor potential bias and ensure compliance with regulations.",
+        "details": "Implement statistical analysis tools to detect bias. Develop UI components for the dashboard and integrate audit logs.",
+        "testStrategy": "Validate dashboard functionality by simulating biased data and checking for correct detection and logging.",
+        "priority": "medium",
+        "dependencies": [
+          12
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "Implement PII De-identification",
+        "description": "Anonymize résumés by removing identifiable information before analysis.",
+        "details": "Develop a service to strip PII from résumés using regex or NLP techniques. Ensure de-identified data is used for analysis.",
+        "testStrategy": "Test PII removal by processing sample résumés and verifying that identifiable information is not present in analysis results.",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "Integrate with ATS (Greenhouse)",
+        "description": "Build integration with Greenhouse ATS for candidate management.",
+        "details": "Use Greenhouse API to push candidate data from the platform. Implement synchronization logic to keep data consistent.",
+        "testStrategy": "Test integration by pushing candidates to Greenhouse and verifying data consistency.",
+        "priority": "medium",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 16,
+        "title": "Implement Automated Actions",
+        "description": "Allow users to configure rules to trigger actions based on candidate categorization.",
+        "details": "Develop a rule engine to define and execute automated actions. Implement UI for rule configuration.",
+        "testStrategy": "Test automated actions by setting up rules and verifying correct execution when conditions are met.",
+        "priority": "medium",
+        "dependencies": [
+          12
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 17,
+        "title": "Integrate Real-time Scheduling",
+        "description": "Integrate with Calendly or Google Calendar API to schedule interviews for 'Fast Track' candidates.",
+        "details": "Use Calendly or Google Calendar API to automate interview scheduling. Implement UI for scheduling configuration.",
+        "testStrategy": "Test scheduling integration by setting up interviews and verifying calendar entries.",
+        "priority": "medium",
+        "dependencies": [
+          16
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 18,
+        "title": "Develop Advanced Analytics",
+        "description": "Introduce a marketplace data network for skill demand and salary trends.",
+        "details": "Develop analytics tools to aggregate and analyze anonymized data. Implement UI components to display trends.",
+        "testStrategy": "Validate analytics by simulating data inputs and verifying trend accuracy.",
+        "priority": "medium",
+        "dependencies": [
+          13
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 19,
+        "title": "Begin ISO/IEC 42001 Certification Process",
+        "description": "Start the process for AI management standard certification.",
+        "details": "Research certification requirements and prepare necessary documentation. Initiate contact with certification bodies.",
+        "testStrategy": "Track certification progress and ensure all requirements are met for compliance.",
+        "priority": "medium",
+        "dependencies": [
+          13
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-06-21T02:23:20.634Z",
+      "updated": "2025-06-21T03:16:07.983Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

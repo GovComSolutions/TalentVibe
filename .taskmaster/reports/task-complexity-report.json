@@ -1,0 +1,165 @@
+{
+	"meta": {
+		"generatedAt": "2025-06-21T02:37:07.089Z",
+		"tasksAnalyzed": 18,
+		"totalTasks": 19,
+		"analysisCount": 19,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": true
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 2,
+			"taskTitle": "Develop UI Foundation",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide into subtasks for setting up the React project, creating navigation, and implementing placeholder components.",
+			"reasoning": "Setting up a UI foundation involves multiple steps including project setup and component creation."
+		},
+		{
+			"taskId": 1,
+			"taskTitle": "Setup Project Repository",
+			"complexityScore": 3,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down the task into creating the Git repository, setting up the project structure, and initializing package files.",
+			"reasoning": "The task involves straightforward steps but requires attention to detail to ensure the correct setup."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "Implement Monolithic Backend",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide the task into setting up the project, implementing endpoints, testing, and ensuring frontend-backend integration.",
+			"reasoning": "The task involves multiple components including setup, implementation, and testing, which increases complexity."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "Implement Core Workflow for Job and Résumé Management",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Separate the task into frontend form development, backend logic implementation, database integration, and testing.",
+			"reasoning": "Involves both frontend and backend development with database integration, requiring coordination and testing."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "Integrate AI Analysis for Candidate Categorization",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down into selecting the API, implementing integration, handling data, storing results, and testing.",
+			"reasoning": "Integration with an external API and handling data flow adds complexity, requiring careful implementation and testing."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "Implement Evidence-Based Explanation Schema",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide into designing the schema, implementing logic, integrating with existing data, and testing explanations.",
+			"reasoning": "Designing a schema and implementing logic for explanations involves detailed planning and testing."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "Display Results in Web UI",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Separate into developing UI components, integrating with backend, ensuring real-time updates, and testing.",
+			"reasoning": "Involves UI development and integration with backend data, requiring attention to detail for real-time updates."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "Implement Multi-Job & Multi-Tenant Support",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down into extending data model, updating backend logic, managing sessions, and testing multi-job functionality.",
+			"reasoning": "Requires significant changes to the data model and backend logic to support complex multi-tenant scenarios."
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "Set Up Asynchronous Processing",
+			"complexityScore": 8,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide into setting up the job queue, refactoring processing logic, integrating with backend, and testing.",
+			"reasoning": "Involves setting up new infrastructure and refactoring existing logic, which is complex and requires thorough testing."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "Containerize Application Services",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Separate into creating Dockerfiles, setting up Docker Compose, testing containers, and ensuring service communication.",
+			"reasoning": "Containerization involves creating and testing multiple configurations, which can be complex but manageable."
+		},
+		{
+			"taskId": 11,
+			"taskTitle": "Implement User Authentication and Security",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down into integrating OAuth, implementing encryption, testing authentication, and verifying data security.",
+			"reasoning": "Security and authentication are critical and complex, requiring careful implementation and rigorous testing."
+		},
+		{
+			"taskId": 12,
+			"taskTitle": "Develop Feedback Loop for Model Fine-Tuning",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide into implementing UI for feedback, backend logic for overrides, storing feedback, and testing.",
+			"reasoning": "Involves both frontend and backend development with a focus on user interaction and data handling."
+		},
+		{
+			"taskId": 13,
+			"taskTitle": "Create Bias & Compliance Dashboard",
+			"complexityScore": 9,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down into implementing analysis tools, developing UI components, integrating audit logs, and testing.",
+			"reasoning": "High complexity due to the need for statistical analysis, UI development, and ensuring compliance."
+		},
+		{
+			"taskId": 14,
+			"taskTitle": "Implement PII De-identification",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Separate into developing PII removal service, integrating with backend, testing de-identification, and ensuring compliance.",
+			"reasoning": "Involves sensitive data handling and ensuring compliance, requiring careful implementation and testing."
+		},
+		{
+			"taskId": 15,
+			"taskTitle": "Integrate with ATS (Greenhouse)",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide into implementing API integration, synchronization logic, testing data consistency, and handling errors.",
+			"reasoning": "Integration with an external system requires careful implementation and testing to ensure data consistency."
+		},
+		{
+			"taskId": 16,
+			"taskTitle": "Implement Automated Actions",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down into developing rule engine, implementing UI for configuration, testing rule execution, and handling edge cases.",
+			"reasoning": "Complex logic for rule execution and user interaction requires detailed implementation and testing."
+		},
+		{
+			"taskId": 17,
+			"taskTitle": "Integrate Real-time Scheduling",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Separate into integrating scheduling API, developing UI for configuration, testing scheduling, and ensuring real-time updates.",
+			"reasoning": "Involves integration with external APIs and real-time updates, requiring careful implementation and testing."
+		},
+		{
+			"taskId": 18,
+			"taskTitle": "Develop Advanced Analytics",
+			"complexityScore": 9,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down into developing analytics tools, implementing data aggregation, developing UI components, and testing accuracy.",
+			"reasoning": "High complexity due to data aggregation, analysis, and UI development, requiring thorough testing."
+		},
+		{
+			"taskId": 19,
+			"taskTitle": "Begin ISO/IEC 42001 Certification Process",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide into researching requirements, preparing documentation, contacting certification bodies, and tracking progress.",
+			"reasoning": "Involves research, documentation, and coordination with external bodies, requiring detailed planning and execution."
+		}
+	]
+}

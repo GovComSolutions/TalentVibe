@@ -1,0 +1,7 @@
+Flask
+Flask-Cors
+pytest
+Flask-SQLAlchemy
+SQLAlchemy
+openai
+python-dotenv 

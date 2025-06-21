@@ -1,0 +1,57 @@
+# FileOrg Virtual Environment
+
+This file provides details on how to manage the 'FileOrg' Python virtual environment.
+
+## Environment Name
+
+The name of the virtual environment is **FileOrg**.
+
+## Activating the Environment
+
+To activate the virtual environment, run the following command from the project root directory in your PowerShell terminal:
+
+```sh
+.\\FileOrg\\Scripts\\Activate.ps1
+```
+
+Your terminal prompt should change to show `(FileOrg)` at the beginning, indicating that the environment is active.
+
+## Deactivating the Environment
+
+To deactivate the virtual environment and return to your global Python environment, simply run the following command:
+
+```sh
+deactivate
+```
+
+## Installing Packages
+
+With the environment active, you can install packages using `pip`. For example:
+
+```sh
+pip install <package_name>
+```
+
+## Project Dependencies
+
+The `requirements.txt` file in this project is used to manage the project's Python dependencies.
+
+To install all the dependencies listed in `requirements.txt`, run:
+
+```sh
+pip install -r requirements.txt
+```
+
+To update the `requirements.txt` file after installing new packages, run:
+
+```sh
+pip freeze > requirements.txt
+```
+
+## Running the Backend Server
+
+To run the backend server, use the following command:
+
+```sh
+python -m backend
+``` 
