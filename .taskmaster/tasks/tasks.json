@@ -269,7 +269,7 @@
         "dependencies": [
           6
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -297,7 +297,7 @@
               2
             ],
             "details": "Use technologies such as WebSockets or server-sent events to update the UI in real-time as data changes.",
-            "status": "pending"
+            "status": "done"
           },
           {
             "id": 4,
@@ -307,7 +307,7 @@
               3
             ],
             "details": "Conduct thorough testing to ensure all components work as expected and that real-time updates are functioning correctly.",
-            "status": "pending"
+            "status": "done"
           }
         ]
       },
