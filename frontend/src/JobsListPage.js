@@ -14,7 +14,7 @@ const JobsListPage = () => {
 
     const fetchJobs = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:5000/api/jobs');
+            const response = await fetch('/api/jobs');
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -38,7 +38,7 @@ const JobsListPage = () => {
         setDeletingJobId(jobId);
         
         try {
-            const response = await fetch(`http://127.0.0.1:5000/api/jobs/${jobId}`, {
+            const response = await fetch(`/api/jobs/${jobId}`, {
                 method: 'DELETE',
             });
 
