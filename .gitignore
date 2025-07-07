@@ -77,4 +77,4 @@ frontend/coverage/
 
 # OS-generated files
 .DS_Store
-Thumbs.db
+Thumbs.db.cursor/mcp.json
