@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import FeedbackModal from './components/FeedbackModal';
 import InterviewModal from './components/InterviewModal';
@@ -46,6 +46,55 @@ const Logistics = ({ logistics }) => (
     </div>
 );
 
+const InterviewHub = ({ resume, onSchedule, onFeedback }) => {
+    const { interview } = resume;
+
+    // A small helper for a consistent "coming soon" alert
+    const comingSoon = (feature) => alert(`${feature}: Coming soon!`);
+
+    if (interview) {
+        switch (interview.status) {
+            case 'scheduled':
+            case 'rescheduled':
+                return (
+                    <div className="interview-hub">
+                        <span className="interview-status-text">✅ Interview Scheduled</span>
+                        <button className="action-button" onClick={() => onSchedule(resume)}>
+                            Reschedule
+                        </button>
+                        <button className="action-button" onClick={() => comingSoon('Prepare Questions')}>
+                            ❓ Prepare Questions
+                        </button>
+                    </div>
+                );
+            case 'completed':
+                return (
+                    <div className="interview-hub">
+                       <span className="interview-status-text">⭐ Completed</span>
+                       <button className="action-button feedback" onClick={() => onFeedback(resume)}>
+                            📝 Log Feedback
+                       </button>
+                    </div>
+                );
+            // Add other statuses like 'cancelled' if needed
+            default:
+                // Fallback for any other status, shows the main schedule button
+                break;
+        }
+    }
+
+    // Default case if no interview object exists or status is not handled above
+    return (
+        <button 
+            className="action-button schedule-interview" 
+            onClick={() => onSchedule(resume)}
+        >
+            <span role="img" aria-label="calendar icon" style={{ marginRight: '8px' }}>🗓️</span>
+            Schedule Interview
+        </button>
+    );
+};
+
 const JobDetailsPage = () => {
     const { jobId } = useParams();
     const [jobDetails, setJobDetails] = useState(null);
@@ -56,36 +105,45 @@ const JobDetailsPage = () => {
     const [selectedResumeForFeedback, setSelectedResumeForFeedback] = useState(null);
     const [isInterviewModalOpen, setIsInterviewModalOpen] = useState(false);
     const [selectedResumeForInterview, setSelectedResumeForInterview] = useState(null);
+    const [currentInterviewResume, setCurrentInterviewResume] = useState(null);
     const detailsRef = useRef(null);
 
-    useEffect(() => {
-        const fetchJobDetails = async () => {
-            try {
-                const response = await fetch(`/api/jobs/${jobId}`);
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                setJobDetails(data);
-            } catch (error) {
-                setError(error.message);
-                console.error(`Failed to fetch job details for job ${jobId}:`, error);
-            } finally {
-                setIsLoading(false);
+    const fetchJobDetails = useCallback(async () => {
+        try {
+            const response = await fetch(`/api/jobs/${jobId}`);
+            if (!response.ok) {
+                if (response.status === 404) {
+                    throw new Error('Job not found.');
+                }
+                throw new Error('Failed to fetch job details');
             }
-        };
-        if (jobId) fetchJobDetails();
-    }, [jobId]);
+            const data = await response.json();
+            setJobDetails(data);
+            if (data.resumes && data.resumes.length > 0) {
+                // Automatically select the first resume or a previously selected one
+                const resumeToSelect = selectedResumeId 
+                    ? data.resumes.find(r => r.id === selectedResumeId) || data.resumes[0]
+                    : data.resumes[0];
+                setSelectedResumeId(resumeToSelect.id);
+            } else {
+                setSelectedResumeId(null);
+            }
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [jobId, selectedResumeId]);
+
+    useEffect(() => {
+        setIsLoading(true);
+        fetchJobDetails();
+    }, [jobId, fetchJobDetails]);
 
     const sortedResumes = useMemo(() => {
         if (!jobDetails?.resumes) return [];
         return [...jobDetails.resumes].sort((a, b) => (b.analysis?.fit_score || 0) - (a.analysis?.fit_score || 0));
     }, [jobDetails]);
-
-    // Automatically select the top-ranked resume on initial load
-    useEffect(() => {
-        if (sortedResumes && sortedResumes.length > 0 && !selectedResumeId) {
-            setSelectedResumeId(sortedResumes[0].id);
-        }
-    }, [sortedResumes, selectedResumeId]);
 
     const selectedResume = useMemo(() => {
         if (!selectedResumeId) return null;
@@ -140,14 +198,21 @@ const JobDetailsPage = () => {
     };
 
     const handleInterviewClick = (resume) => {
-        setSelectedResumeForInterview(resume);
+        setCurrentInterviewResume(resume);
         setIsInterviewModalOpen(true);
     };
 
+    const handleCloseInterviewModal = () => {
+        setIsInterviewModalOpen(false);
+        setCurrentInterviewResume(null);
+    };
+
     const handleInterviewCreated = (interviewId) => {
-        // Optionally refresh the page or show a success message
-        console.log('Interview created with ID:', interviewId);
-        // You could also update the UI to show that an interview was scheduled
+        // We need to refresh the job details to get the new interview status
+        console.log('Interview created/updated with ID:', interviewId);
+        setIsInterviewModalOpen(false);
+        // Trigger a re-fetch of job details
+        fetchJobDetails(); 
     };
 
     const getScoreClass = (score) => {
@@ -155,12 +220,6 @@ const JobDetailsPage = () => {
         if (score >= 80) return 'medium-high';
         if (score >= 65) return 'medium';
         return 'low';
-    };
-
-    const getBucketClass = (bucket) => {
-        if (!bucket) return 'default';
-        const bucketName = bucket.toLowerCase().replace(/\s+/g, '-');
-        return `bucket-${bucketName}`;
     };
 
     if (isLoading) return <div className="job-details-container"><p>Loading job details...</p></div>;
@@ -214,36 +273,31 @@ const JobDetailsPage = () => {
                     <div key={selectedResume.id} className="glass-container detailed-resume-card">
                         <div className="detailed-resume-header">
                             <div>
-                                <div className={`candidate-bucket-tag ${getBucketClass(selectedResume.analysis?.bucket)}`}>
-                                    {selectedResume.analysis?.bucket || 'Pending'}
+                                <div className="candidate-bucket-tag book-the-call">
+                                    🔥 BOOK-THE-CALL
                                 </div>
-                                <h3 className="candidate-name">{selectedResume.candidate_name || selectedResume.filename}</h3>
+                                <h3 className="candidate-name">{selectedResume.candidate_name || 'Candidate Details'}</h3>
                             </div>
                             <div className="header-actions">
-                                <button 
-                                    className="interview-button"
-                                    onClick={() => handleInterviewClick(selectedResume)}
-                                >
-                                    📅 Schedule Interview
-                                </button>
-                                <button 
-                                    className="feedback-button"
-                                    onClick={() => handleFeedbackClick(selectedResume)}
-                                >
-                                    💬 Provide Feedback
-                                </button>
-                                <span className={`score-badge large ${getScoreClass(selectedResume.analysis?.fit_score)}`}>
+                                <InterviewHub 
+                                    resume={selectedResume} 
+                                    onSchedule={handleInterviewClick} 
+                                    onFeedback={() => alert('Feedback form coming soon!')}
+                                />
+                                <div className="score-badge large">
                                     FIT SCORE: {selectedResume.analysis?.fit_score || 'N/A'} / 100
-                                </span>
+                                </div>
                             </div>
                         </div>
                         <p className="reasoning">{selectedResume.analysis?.reasoning}</p>
+                        
+                        <div className="section-title">Summary</div>
                         <div className="summary-points">
-                            <h4>Summary</h4>
                             <ul>
                                 {selectedResume.analysis?.summary_points?.map((point, i) => <li key={`sum-${i}`}>{point}</li>)}
                             </ul>
                         </div>
+
                         {selectedResume.analysis?.skill_matrix && <SkillMatrix skills={selectedResume.analysis.skill_matrix} />}
                         {selectedResume.analysis?.timeline && <Timeline timeline={selectedResume.analysis.timeline} />}
                         {selectedResume.analysis?.logistics && <Logistics logistics={selectedResume.analysis.logistics} />}
@@ -261,8 +315,8 @@ const JobDetailsPage = () => {
 
             <InterviewModal
                 isOpen={isInterviewModalOpen}
-                onClose={() => setIsInterviewModalOpen(false)}
-                resume={selectedResumeForInterview}
+                onClose={handleCloseInterviewModal}
+                resume={currentInterviewResume}
                 jobId={jobId}
                 onInterviewCreated={handleInterviewCreated}
             />

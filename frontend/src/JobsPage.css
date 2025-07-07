@@ -162,33 +162,46 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    flex-wrap: wrap;
 }
 
-.feedback-button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
+.interview-hub {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    gap: 0.75rem;
 }
 
-.feedback-button:hover {
+.interview-status-text {
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    white-space: nowrap;
+}
+
+.action-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.action-button:hover {
+    background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
 }
 
-.interview-button {
-    background: linear-gradient(135deg, #00aaff 0%, #0088cc 100%);
+.interview-button,
+.feedback-button {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -209,6 +222,12 @@
     background: linear-gradient(135deg, #0099ee 0%, #0077aa 100%);
 }
 
+.feedback-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
 .detailed-resume-header h3.candidate-name {
     margin: 0.5rem 0 0 0;
     font-size: 2rem;
@@ -220,7 +239,6 @@
 }
 
 .candidate-bucket-tag {
-    display: inline-block;
     font-size: 0.8rem;
     font-weight: 700;
     padding: 0.3rem 0.8rem;
@@ -228,6 +246,8 @@
     text-transform: uppercase;
     color: #fff;
     background-color: #888; /* Default color */
+    margin-bottom: 0.5rem;
+    display: inline-block;
 }
 
 /* Bucket-specific colors */
@@ -238,6 +258,11 @@
 .candidate-bucket-tag.bucket-lacks-experience { background-color: #e73c7e; }
 .candidate-bucket-tag.bucket-not-a-fit { background-color: #898989; }
 .candidate-bucket-tag.bucket-default { background-color: #5c5c5c; }
+.candidate-bucket-tag.book-the-call {
+    background: rgba(255, 165, 0, 0.15);
+    color: #ffab40;
+    border: 1px solid rgba(255, 165, 0, 0.3);
+}
 
 .reasoning {
     font-style: italic;
@@ -385,4 +410,118 @@
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
+}
+
+.detailed-resume-header h3.candidate-name {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.header-actions .score-badge.large {
+    background: #1e3a8a; /* A deep blue color */
+    border: 1px solid rgba(59, 130, 246, 0.5); /* A slightly lighter blue border */
+    color: #eff6ff; /* A very light blue/white text */
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.reasoning {
+    margin-bottom: 2rem;
+    color: var(--text-color-dark);
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.summary-points {
+    margin-bottom: 2rem;
+}
+
+.summary-points ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.summary-points ul li {
+    padding-left: 1.5em;
+    position: relative;
+    color: var(--text-color);
+}
+
+.summary-points ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.skill-matrix {
+    display: grid;
+    gap: 2rem;
+}
+
+.skill-column {
+    flex: 1;
+}
+
+.skill-column h4 {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+}
+.skill-column.matches h4 { color: #23d5ab; }
+.skill-column.gaps h4 { color: #e73c7e; }
+
+.skill-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.skill-column li {
+    background-color: rgba(0,0,0,0.2);
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.action-button.schedule-interview {
+    background: linear-gradient(90deg, rgba(228,93,156,1) 0%, rgba(123,104,238,1) 100%);
+    border: none;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 100px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.action-button.schedule-interview:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 } 

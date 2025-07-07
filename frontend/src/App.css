@@ -40,7 +40,7 @@
 }
 
 .app-content {
-  padding-top: 80px; /* Space for header */
+  padding-top: 130px; /* Generous space for the fixed header */
   padding-bottom: 80px; /* Space for footer */
   max-width: 1200px;
   margin: 0 auto;

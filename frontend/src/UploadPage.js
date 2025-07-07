@@ -87,7 +87,7 @@ const UploadPage = () => {
 
         setTimeout(async () => {
             const formData = new FormData();
-            formData.append('jobDescription', jobDescription);
+            formData.append('job_description', jobDescription);
             for (let i = 0; i < resumes.length; i++) {
                 formData.append('resumes', resumes[i]);
             }
@@ -213,4 +213,4 @@ const UploadPage = () => {
     );
 };
 
-export default UploadPage; 
+export default UploadPage;

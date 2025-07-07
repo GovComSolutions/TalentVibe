@@ -277,10 +277,10 @@ def analyze_resumes():
         db.session.commit()
     # --- End Temp ---
 
-    if 'jobDescription' not in request.form:
+    job_description = request.form.get('job_description') or request.form.get('jobDescription')
+    if not job_description:
         return jsonify({'error': 'No job description provided'}), 400
 
-    job_description = request.form['jobDescription']
     resumes = request.files.getlist('resumes')
 
     # Check if a job with this description already exists FOR THIS USER.
@@ -343,7 +343,7 @@ def analyze_resumes():
     }
 
     # Queue background job using Celery
-    process_job_resumes.delay(job.id, resumes_data, job_description)
+    process_job_resumes(job.id, resumes_data, job_description)
 
     return jsonify({
         'message': f'Queued {len(resumes_data)} resumes for background processing',
@@ -1095,4 +1095,8 @@ def delete_interview_question(question_id):
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': f'Failed to delete question: {str(e)}'}), 500 
+        return jsonify({'error': f'Failed to delete question: {str(e)}'}), 500
+
+if __name__ == "__main__":
+    app = Flask(__name__)
+    # ... rest of the startup code ... 

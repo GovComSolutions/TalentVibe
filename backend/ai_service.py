@@ -83,4 +83,38 @@ The JSON must have the following structure:
             "logistics": {{}}
         }}
         import json
-        return json.dumps(error_response) 
+        return json.dumps(error_response)
+
+def extract_job_title_with_ai(job_description):
+    """
+    Analyzes a job description using the OpenAI API to extract just the job title.
+    """
+    client = get_client()
+
+    prompt = f"""
+Please analyze the following job description and extract the official job title.
+Return only the job title and nothing else.
+
+For example, if the description says "We are looking for a Senior Software Engineer (Backend)", you should return "Senior Software Engineer (Backend)".
+
+**Job Description:**
+{job_description}
+---
+**Job Title:**
+"""
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo", # Using a faster, cheaper model for this simple task
+            messages=[
+                {"role": "system", "content": "You are an assistant that extracts specific information."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0,
+            max_tokens=50
+        )
+        # Strip any potential leading/trailing whitespace or quotes
+        return response.choices[0].message.content.strip().strip('"')
+    except Exception as e:
+        print(f"An error occurred during job title extraction: {e}")
+        return "Job Title Not Found" 
