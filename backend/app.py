@@ -1,3 +1,5 @@
+print("[DEBUG] Starting backend/app.py")
+
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -1098,5 +1100,5 @@ def delete_interview_question(question_id):
         return jsonify({'error': f'Failed to delete question: {str(e)}'}), 500
 
 if __name__ == "__main__":
-    app = Flask(__name__)
-    # ... rest of the startup code ... 
+    print("[DEBUG] Entered __main__ block, starting SocketIO server...")
+    socketio.run(app, host="0.0.0.0", port=5000, debug=True) 
