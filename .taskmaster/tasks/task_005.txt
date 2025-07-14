@@ -1,0 +1,43 @@
+# Task ID: 5
+# Title: Integrate AI Analysis for Candidate Categorization
+# Status: done
+# Dependencies: 4
+# Priority: medium
+# Description: Integrate with a single LLM API to perform candidate categorization into buckets.
+# Details:
+Select an LLM API for integration. Implement backend logic to send résumé data to the LLM and receive categorization results. Store results in the database.
+
+# Test Strategy:
+Validate integration by checking if résumés are correctly categorized and results are stored.
+
+# Subtasks:
+## 1. Select the API [done]
+### Dependencies: None
+### Description: Research and choose the most suitable API for integration based on project requirements.
+### Details:
+Consider factors such as API functionality, reliability, documentation, and cost.
+
+## 2. Implement API Integration [done]
+### Dependencies: 5.1
+### Description: Develop the code necessary to integrate the selected API into the project.
+### Details:
+Use appropriate libraries and frameworks to facilitate the integration process.
+
+## 3. Handle Data Flow [done]
+### Dependencies: 5.2
+### Description: Design and implement the data flow between the API and the project.
+### Details:
+Ensure data is correctly formatted, validated, and processed as it moves between systems.
+
+## 4. Store Results [done]
+### Dependencies: 5.3
+### Description: Develop a system to store the results obtained from the API.
+### Details:
+Choose an appropriate storage solution and ensure data integrity and security.
+
+## 5. Test Integration and Data Handling [done]
+### Dependencies: 5.4
+### Description: Conduct thorough testing of the API integration and data handling processes.
+### Details:
+Perform unit, integration, and system testing to ensure everything works as expected.
+

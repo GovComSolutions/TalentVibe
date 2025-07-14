@@ -293,3 +293,74 @@
         opacity: 1;
     }
 } 
+
+.jobdesc-multi-input {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.jobdesc-drop-zone {
+  border: 2px dashed var(--glass-border-color);
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.jobdesc-drop-zone:hover,
+.jobdesc-drop-zone.dragging {
+  border-color: var(--primary-color);
+  background: rgba(0, 170, 255, 0.08);
+}
+.jobdesc-drop-input {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.jobdesc-drop-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+.jobdesc-drop-icon {
+  font-size: 2.2rem;
+  margin-bottom: 0.2rem;
+}
+.jobdesc-file-list {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 0.5rem;
+  background: rgba(0,0,0,0.15);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+}
+.jobdesc-file-name {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.jobdesc-file-remove {
+  background: none;
+  border: none;
+  color: #ff0055;
+  font-size: 1.3rem;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.jobdesc-file-remove:hover {
+  background: rgba(255,0,85,0.08);
+} 

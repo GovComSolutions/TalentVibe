@@ -1,0 +1,11 @@
+# Task ID: 12
+# Title: Develop Feedback Loop for Model Fine-Tuning
+# Status: done
+# Dependencies: 7
+# Priority: medium
+# Description: Allow users to override candidate buckets and provide feedback for model improvement.
+# Details:
+Implement a feedback system where users can override AI bucket assignments and provide feedback. Store feedback data for future model training.
+
+# Test Strategy:
+Test feedback submission and bucket override functionality. Verify feedback data is properly stored.

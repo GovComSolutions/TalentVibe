@@ -466,11 +466,38 @@
         ],
         "status": "pending",
         "subtasks": []
+      },
+      {
+        "id": 20,
+        "title": "Implement Responsive Hamburger Menu for Mobile",
+        "description": "Replace the top navigation menu with a hamburger menu on smaller screens, ensuring it is responsive and accessible.",
+        "details": "To implement the responsive hamburger menu, first detect the screen size using CSS media queries. For screens below a certain width (e.g., 768px), hide the existing top navigation menu and display a hamburger icon instead. Use JavaScript to toggle the visibility of the navigation options when the hamburger icon is clicked. The menu should include options for Home, Upload, Jobs, and Interviews. Ensure the menu is accessible by adding ARIA attributes and keyboard navigation support. Consider using a CSS framework like Bootstrap for responsive design or custom CSS for more control. Test across different devices and browsers to ensure consistent behavior.",
+        "testStrategy": "Verify the hamburger menu appears on screens smaller than the defined breakpoint and the top navigation is hidden. Test the toggle functionality by clicking the hamburger icon to ensure the menu options appear and disappear correctly. Check accessibility by navigating the menu using keyboard shortcuts and screen readers. Test on multiple devices and browsers to ensure responsiveness and functionality are consistent.",
+        "status": "done",
+        "dependencies": [
+          7
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 21,
+        "title": "Enhance Job Description Input with Multiple Upload Options",
+        "description": "Allow users to paste text, drag and drop a file, or attach a file for job description input, supporting .pdf, .docx, and .txt formats.",
+        "details": "Update the job description input UI to clearly present three options: text paste, drag and drop file, and file attachment. Implement frontend logic to handle file uploads, ensuring compatibility with .pdf, .docx, and .txt formats. Use a library like FilePond for drag and drop functionality and file type validation. Update backend endpoints to process and store uploaded files, ensuring they are converted to a consistent format for storage and analysis. Consider user experience and accessibility in the UI design, providing clear instructions and feedback during the upload process.",
+        "testStrategy": "Verify the UI displays all three input options and allows users to successfully paste text, drag and drop files, and attach files. Test with .pdf, .docx, and .txt files to ensure they are accepted and correctly processed. Check that uploaded files are stored in the database and can be retrieved and displayed correctly. Conduct usability testing to ensure the interface is intuitive and accessible.",
+        "status": "pending",
+        "dependencies": [
+          4,
+          8
+        ],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-06-21T02:23:20.634Z",
-      "updated": "2025-06-21T13:30:00.000Z",
+      "updated": "2025-07-12T21:40:33.258Z",
       "description": "Tasks for master context"
     }
   }

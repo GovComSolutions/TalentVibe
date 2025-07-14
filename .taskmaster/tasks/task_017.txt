@@ -1,0 +1,11 @@
+# Task ID: 17
+# Title: Integrate Real-time Scheduling
+# Status: pending
+# Dependencies: 16
+# Priority: medium
+# Description: Integrate with Calendly or Google Calendar API to schedule interviews for 'Fast Track' candidates.
+# Details:
+Use Calendly or Google Calendar API to automate interview scheduling. Implement UI for scheduling configuration.
+
+# Test Strategy:
+Test scheduling integration by setting up interviews and verifying calendar entries.

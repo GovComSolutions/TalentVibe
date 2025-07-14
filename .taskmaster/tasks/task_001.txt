@@ -1,0 +1,11 @@
+# Task ID: 1
+# Title: Setup Project Repository
+# Status: done
+# Dependencies: None
+# Priority: medium
+# Description: Initialize the project repository for the AI résumé-intelligence platform.
+# Details:
+Create a new Git repository. Set up the initial project structure with directories for frontend, backend, and documentation. Initialize package.json for the frontend and requirements.txt for the backend.
+
+# Test Strategy:
+Verify repository setup by cloning it to a different location and ensuring all initial files and directories are present.

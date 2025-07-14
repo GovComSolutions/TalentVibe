@@ -1,0 +1,11 @@
+# Task ID: 15
+# Title: Integrate with ATS (Greenhouse)
+# Status: pending
+# Dependencies: 8
+# Priority: medium
+# Description: Build integration with Greenhouse ATS for candidate management.
+# Details:
+Use Greenhouse API to push candidate data from the platform. Implement synchronization logic to keep data consistent.
+
+# Test Strategy:
+Test integration by pushing candidates to Greenhouse and verifying data consistency.

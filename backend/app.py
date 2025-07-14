@@ -280,6 +280,27 @@ def analyze_resumes():
     # --- End Temp ---
 
     job_description = request.form.get('job_description') or request.form.get('jobDescription')
+
+    # If not present, try to extract from uploaded file
+    if not job_description:
+        job_desc_file = request.files.get('job_description_file')
+        if job_desc_file:
+            filename = job_desc_file.filename
+            file_stream = job_desc_file.read()
+            if filename.endswith('.pdf'):
+                pdf_doc = fitz.open(stream=file_stream, filetype='pdf')
+                job_description = ""
+                for page in pdf_doc:
+                    job_description += page.get_text()
+                pdf_doc.close()
+            elif filename.endswith('.docx'):
+                doc = docx.Document(io.BytesIO(file_stream))
+                job_description = "\n".join([para.text for para in doc.paragraphs])
+            else:
+                job_description = file_stream.decode('utf-8')
+            job_description = job_description.strip()
+
+    # If still not present, return error
     if not job_description:
         return jsonify({'error': 'No job description provided'}), 400
 

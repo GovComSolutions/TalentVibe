@@ -1,0 +1,37 @@
+# Task ID: 3
+# Title: Implement Monolithic Backend
+# Status: done
+# Dependencies: 1
+# Priority: medium
+# Description: Create a single Python backend to handle initial logic using Flask or FastAPI.
+# Details:
+Set up a Flask or FastAPI project. Implement basic endpoints for job creation and résumé upload. Ensure the backend can serve the frontend application.
+
+# Test Strategy:
+Write unit tests for each endpoint to verify they return the expected responses.
+
+# Subtasks:
+## 1. Set Up Project [done]
+### Dependencies: None
+### Description: Initialize the project environment and repository.
+### Details:
+Create a new repository, set up the project structure, and configure necessary tools and dependencies.
+
+## 2. Implement Endpoints [done]
+### Dependencies: 3.1
+### Description: Develop the necessary API endpoints for the project.
+### Details:
+Design and code the backend API endpoints required for the application functionality.
+
+## 3. Test Endpoints [done]
+### Dependencies: 3.2
+### Description: Perform testing on the implemented API endpoints.
+### Details:
+Write and execute test cases to ensure the API endpoints function correctly and handle edge cases.
+
+## 4. Ensure Frontend-Backend Integration [done]
+### Dependencies: 3.3
+### Description: Verify that the frontend and backend components work together seamlessly.
+### Details:
+Test the integration between the frontend and backend, ensuring data flows correctly and the user interface updates as expected.
+

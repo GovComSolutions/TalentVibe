@@ -1,0 +1,11 @@
+# Task ID: 13
+# Title: Create Bias & Compliance Dashboard
+# Status: pending
+# Dependencies: 12
+# Priority: medium
+# Description: Develop a dashboard to monitor potential bias and ensure compliance with regulations.
+# Details:
+Implement statistical analysis tools to detect bias. Develop UI components for the dashboard and integrate audit logs.
+
+# Test Strategy:
+Validate dashboard functionality by simulating biased data and checking for correct detection and logging.

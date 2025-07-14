@@ -1,0 +1,11 @@
+# Task ID: 14
+# Title: Implement PII De-identification
+# Status: pending
+# Dependencies: 5
+# Priority: medium
+# Description: Anonymize résumés by removing identifiable information before analysis.
+# Details:
+Develop a service to strip PII from résumés using regex or NLP techniques. Ensure de-identified data is used for analysis.
+
+# Test Strategy:
+Test PII removal by processing sample résumés and verifying that identifiable information is not present in analysis results.

@@ -1,0 +1,11 @@
+# Task ID: 10
+# Title: Containerize Application Services
+# Status: done
+# Dependencies: 3
+# Priority: medium
+# Description: Containerize the application services using Docker for deployment.
+# Details:
+Create Dockerfiles for the frontend and backend services. Set up Docker Compose for local development and testing.
+
+# Test Strategy:
+Test containerization by building and running the services in Docker, ensuring they communicate correctly.

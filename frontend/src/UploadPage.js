@@ -3,8 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import './UploadPage.css';
 
+const allowedJobDescTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+
 const UploadPage = () => {
     const [jobDescription, setJobDescription] = useState('');
+    const [jobDescFile, setJobDescFile] = useState(null);
+    const [jobDescDrag, setJobDescDrag] = useState(false);
     const [resumes, setResumes] = useState([]);
     const [message, setMessage] = useState('');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -46,6 +50,41 @@ const UploadPage = () => {
         };
     }, [navigate, currentJobId]);
 
+    // Job Description File Handlers
+    const handleJobDescFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file && allowedJobDescTypes.includes(file.type)) {
+            setJobDescFile(file);
+            setJobDescription('');
+        } else {
+            setMessage('Error: Only .pdf, .docx, or .txt files are allowed for job description.');
+        }
+    };
+    const handleJobDescDragOver = (e) => {
+        e.preventDefault();
+        setJobDescDrag(true);
+    };
+    const handleJobDescDragLeave = (e) => {
+        e.preventDefault();
+        setJobDescDrag(false);
+    };
+    const handleJobDescDrop = (e) => {
+        e.preventDefault();
+        setJobDescDrag(false);
+        const file = e.dataTransfer.files[0];
+        if (file && allowedJobDescTypes.includes(file.type)) {
+            setJobDescFile(file);
+            setJobDescription('');
+        } else {
+            setMessage('Error: Only .pdf, .docx, or .txt files are allowed for job description.');
+        }
+    };
+    const handleJobDescText = (e) => {
+        setJobDescription(e.target.value);
+        setJobDescFile(null);
+    };
+    const clearJobDescFile = () => setJobDescFile(null);
+
     const handleFileChange = (e) => {
         if (e.target.files) {
             setResumes([...e.target.files]);
@@ -79,6 +118,10 @@ const UploadPage = () => {
             setMessage('Error: Please upload at least one résumé.');
             return;
         }
+        if (!jobDescription && !jobDescFile) {
+            setMessage('Error: Please provide a job description (paste/type or upload a file).');
+            return;
+        }
 
         setIsAnalyzing(true);
         setAnalysisResult(null);
@@ -87,7 +130,11 @@ const UploadPage = () => {
 
         setTimeout(async () => {
             const formData = new FormData();
-            formData.append('job_description', jobDescription);
+            if (jobDescFile) {
+                formData.append('job_description_file', jobDescFile);
+            } else {
+                formData.append('job_description', jobDescription);
+            }
             for (let i = 0; i < resumes.length; i++) {
                 formData.append('resumes', resumes[i]);
             }
@@ -132,13 +179,46 @@ const UploadPage = () => {
                 <form onSubmit={handleSubmit} className="upload-form">
                     <div className="form-group">
                         <label htmlFor="jobDescription">Job Description</label>
-                        <textarea
-                            id="jobDescription"
-                            value={jobDescription}
-                            onChange={(e) => setJobDescription(e.target.value)}
-                            placeholder="Paste the full job description here..."
-                            required
-                        />
+                        <div className="jobdesc-multi-input">
+                            {/* Paste/Type */}
+                            <textarea
+                                id="jobDescription"
+                                value={jobDescription}
+                                onChange={handleJobDescText}
+                                placeholder="Paste or type the full job description here..."
+                                disabled={!!jobDescFile}
+                                required={!jobDescFile}
+                            />
+                            {/* Drag & Drop */}
+                            <div
+                                className={`jobdesc-drop-zone${jobDescDrag ? ' dragging' : ''}`}
+                                onDragOver={handleJobDescDragOver}
+                                onDragLeave={handleJobDescDragLeave}
+                                onDrop={handleJobDescDrop}
+                                tabIndex={0}
+                                aria-label="Drag and drop a job description file here"
+                            >
+                                <input
+                                    type="file"
+                                    accept=".pdf,.docx,.txt"
+                                    className="jobdesc-drop-input"
+                                    onChange={handleJobDescFileChange}
+                                    disabled={!!jobDescFile}
+                                />
+                                <div className="jobdesc-drop-prompt">
+                                    <span className="jobdesc-drop-icon">📎</span>
+                                    <p>Drag & drop a file here, or click to attach</p>
+                                    <p className="file-types">Supports: .pdf, .docx, .txt</p>
+                                </div>
+                            </div>
+                            {/* Show attached file if present */}
+                            {jobDescFile && (
+                                <div className="jobdesc-file-list">
+                                    <span className="jobdesc-file-name">{jobDescFile.name}</span>
+                                    <button type="button" className="jobdesc-file-remove" onClick={clearJobDescFile}>&times;</button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                     <div className="form-group">
                         <label>Upload Résumés</label>

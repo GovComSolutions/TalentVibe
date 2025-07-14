@@ -72,4 +72,161 @@
 .nav-link.active {
     color: #fff;
     font-weight: 600;
+}
+
+/* Hide desktop nav and show hamburger on small screens */
+.nav-desktop {
+  display: flex;
+  gap: 1.5rem;
+}
+.hamburger {
+  display: none;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  z-index: 1201;
+  transition: box-shadow 0.2s;
+  box-shadow: 0 2px 12px var(--shadow-color);
+}
+.hamburger:focus {
+  outline: 2px solid var(--primary-color);
+}
+.bar {
+  width: 24px;
+  height: 3px;
+  background: #fff;
+  margin: 3px 0;
+  border-radius: 2px;
+  transition: all 0.4s cubic-bezier(.68,-0.55,.27,1.55);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+.hamburger.open .top {
+  transform: translateY(6px) rotate(45deg);
+}
+.hamburger.open .middle {
+  opacity: 0;
+}
+.hamburger.open .bottom {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* Hide nav-desktop and header-nav always */
+.nav-desktop, .header-nav {
+  display: none !important;
+}
+
+.mobile-menu {
+  position: absolute;
+  top: 60px; /* below header/hamburger */
+  right: 2rem;
+  width: 240px;
+  min-height: 180px;
+  background: rgba(20, 20, 40, 0.28);
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  gap: 1.5rem;
+  border-radius: 24px;
+  border: 1.5px solid rgba(255,255,255,0.10);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-10px);
+  transition: opacity 0.3s cubic-bezier(.68,-0.55,.27,1.55), transform 0.3s cubic-bezier(.68,-0.55,.27,1.55);
+}
+.mobile-menu.open {
+  opacity: 0.98;
+  pointer-events: auto;
+  transform: translateY(0);
+  right: 2rem;
+}
+.mobile-menu .nav-link {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  padding: 0.7rem 0;
+  width: 100%;
+  border-radius: 8px;
+  background: none;
+  transition: background 0.2s, color 0.2s;
+  position: relative;
+}
+.mobile-menu .nav-link.active,
+.mobile-menu .nav-link:hover {
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  color: #fff;
+}
+
+/* Remove or fix any overlay/shadow on the left of the header bar when menu is open */
+.menu-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.18); /* lighter, less intrusive */
+  z-index: 1199;
+  animation: fadeInOverlay 0.3s;
+}
+
+.header {
+  box-shadow: 0 4px 30px rgba(0,0,0,0.18); /* consistent, subtle shadow */
+}
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+} 
+
+.header-logo-group {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.tv-logo-icon {
+  height: 38px;
+  width: 38px;
+  display: block;
+}
+
+.tv-logo-text-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.tv-logo-text-gradient {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #00aaff 0%, #ff00c8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 0.5px;
+}
+
+.tv-logo-underline {
+  margin-top: 2px;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #00aaff 0%, #ff00c8 100%);
+  opacity: 0.7;
 } 

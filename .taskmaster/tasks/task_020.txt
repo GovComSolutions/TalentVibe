@@ -1,0 +1,11 @@
+# Task ID: 20
+# Title: Implement Responsive Hamburger Menu for Mobile
+# Status: done
+# Dependencies: 7
+# Priority: medium
+# Description: Replace the top navigation menu with a hamburger menu on smaller screens, ensuring it is responsive and accessible.
+# Details:
+To implement the responsive hamburger menu, first detect the screen size using CSS media queries. For screens below a certain width (e.g., 768px), hide the existing top navigation menu and display a hamburger icon instead. Use JavaScript to toggle the visibility of the navigation options when the hamburger icon is clicked. The menu should include options for Home, Upload, Jobs, and Interviews. Ensure the menu is accessible by adding ARIA attributes and keyboard navigation support. Consider using a CSS framework like Bootstrap for responsive design or custom CSS for more control. Test across different devices and browsers to ensure consistent behavior.
+
+# Test Strategy:
+Verify the hamburger menu appears on screens smaller than the defined breakpoint and the top navigation is hidden. Test the toggle functionality by clicking the hamburger icon to ensure the menu options appear and disappear correctly. Check accessibility by navigating the menu using keyboard shortcuts and screen readers. Test on multiple devices and browsers to ensure responsiveness and functionality are consistent.

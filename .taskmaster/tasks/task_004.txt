@@ -1,0 +1,43 @@
+# Task ID: 4
+# Title: Implement Core Workflow for Job and Résumé Management
+# Status: done
+# Dependencies: 2, 3
+# Priority: medium
+# Description: Allow a user to paste a single job description and upload résumés in PDF format.
+# Details:
+Develop frontend forms for job description input and résumé upload. Implement backend logic to handle these inputs and store them in a database.
+
+# Test Strategy:
+Test the workflow by creating a job and uploading résumés, then verify data is correctly stored and retrievable.
+
+# Subtasks:
+## 1. Frontend Form Development [done]
+### Dependencies: None
+### Description: Design and implement the user interface for the form, ensuring it is responsive and user-friendly.
+### Details:
+Use HTML, CSS, and JavaScript to create the form layout and functionality. Ensure compatibility across different browsers and devices.
+
+## 2. Backend Logic Implementation [done]
+### Dependencies: 4.1
+### Description: Develop the server-side logic to handle form submissions and process data.
+### Details:
+Use a backend framework (e.g., Node.js, Django) to create endpoints for form submission and data processing. Implement validation and error handling.
+
+## 3. Database Integration [done]
+### Dependencies: 4.2
+### Description: Set up a database to store form data and integrate it with the backend.
+### Details:
+Choose a suitable database (e.g., MySQL, MongoDB) and design the schema. Implement CRUD operations to manage form data.
+
+## 4. Testing [done]
+### Dependencies: 4.1, 4.2, 4.3
+### Description: Conduct thorough testing of the form, backend logic, and database integration.
+### Details:
+Perform unit, integration, and user acceptance testing to ensure all components work as expected. Address any bugs or issues found.
+
+## 5. Complexity Analysis and Coordination [done]
+### Dependencies: 4.1, 4.2, 4.3, 4.4
+### Description: Analyze the complexity of the project and ensure coordination between frontend and backend teams.
+### Details:
+Review the project to identify potential bottlenecks and ensure smooth communication between teams. Adjust timelines and resources as needed.
+

@@ -1,0 +1,11 @@
+# Task ID: 11
+# Title: Implement User Authentication and Security
+# Status: pending
+# Dependencies: 8
+# Priority: medium
+# Description: Implement OAuth for user authentication and encrypt résumé data at rest.
+# Details:
+Integrate an OAuth provider for authentication. Implement AES-256 encryption for résumé data storage.
+
+# Test Strategy:
+Test authentication by logging in with different user accounts. Verify data encryption by checking database entries.

@@ -1,0 +1,11 @@
+# Task ID: 8
+# Title: Implement Multi-Job & Multi-Tenant Support
+# Status: done
+# Dependencies: 4
+# Priority: medium
+# Description: Introduce 'Job' and 'User' objects to the data model for managing multiple jobs.
+# Details:
+Extend the data model to include Job and User entities. Update backend logic to support multiple jobs per user and manage user sessions.
+
+# Test Strategy:
+Test multi-job management by creating multiple jobs under different users and verifying data isolation.

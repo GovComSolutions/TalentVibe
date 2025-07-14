@@ -1,0 +1,11 @@
+# Task ID: 21
+# Title: Enhance Job Description Input with Multiple Upload Options
+# Status: pending
+# Dependencies: 4, 8
+# Priority: medium
+# Description: Allow users to paste text, drag and drop a file, or attach a file for job description input, supporting .pdf, .docx, and .txt formats.
+# Details:
+Update the job description input UI to clearly present three options: text paste, drag and drop file, and file attachment. Implement frontend logic to handle file uploads, ensuring compatibility with .pdf, .docx, and .txt formats. Use a library like FilePond for drag and drop functionality and file type validation. Update backend endpoints to process and store uploaded files, ensuring they are converted to a consistent format for storage and analysis. Consider user experience and accessibility in the UI design, providing clear instructions and feedback during the upload process.
+
+# Test Strategy:
+Verify the UI displays all three input options and allows users to successfully paste text, drag and drop files, and attach files. Test with .pdf, .docx, and .txt files to ensure they are accepted and correctly processed. Check that uploaded files are stored in the database and can be retrieved and displayed correctly. Conduct usability testing to ensure the interface is intuitive and accessible.

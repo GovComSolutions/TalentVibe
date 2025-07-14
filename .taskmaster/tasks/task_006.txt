@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: Implement Evidence-Based Explanation Schema
+# Status: done
+# Dependencies: 5
+# Priority: medium
+# Description: Provide structured explanations for candidate categorization based on résumé analysis.
+# Details:
+Design a schema for explanations that includes matched and missing skills. Implement logic to generate explanations using data from the LLM API.
+
+# Test Strategy:
+Review generated explanations for accuracy and completeness against sample résumés.

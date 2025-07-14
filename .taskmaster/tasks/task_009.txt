@@ -1,0 +1,11 @@
+# Task ID: 9
+# Title: Set Up Asynchronous Processing
+# Status: done
+# Dependencies: 3
+# Priority: medium
+# Description: Refactor backend to use a job queue for non-blocking résumé processing.
+# Details:
+Implement an asynchronous job queue using Celery with RabbitMQ or Redis. Update résumé processing logic to use the queue.
+
+# Test Strategy:
+Verify asynchronous processing by uploading multiple résumés and checking that processing occurs without blocking.
